@@ -24,6 +24,10 @@
     min-height: 100px;
 }
 
+.solver input[type="number"] {
+    width: 45px;
+}
+
 .solver h2 {
     margin-top: 8px;
     margin-bottom: 0px;

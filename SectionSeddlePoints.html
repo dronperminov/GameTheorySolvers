@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Минимакс, максимин и седловые точки на отрезке | Решатели по курса "Теория игр"</title>
+</head>
+<body>
+    <div class="content">
+        <h1>Минимакс, максимин и седловые точки на отрезке</h1>
+        <div class="solver seddle-point-solver">
+            <div><label>f(x, y) = <input type="text" id="function-box" value="2x^2 - 3xy + 2y^2"></label></div>
+            <div><label>Отрезок: <input type="number" id="a-box" value="0"> <input type="number" id="b-box" value="1"></label></div>
+
+            <div class="button" id="solve-btn">Решить</div>
+            <div id="solve-box" class="solve"></div>
+        </div>
+    </div>
+
+    <script src="js/BigInteger.min.js"></script>
+    <script src="js/Fraction.js"></script>
+    <script src="js/plotly.min.js"></script>
+    <script src="solvers/SectionSeddlePointSolver.js"></script>
+    <script>
+        let solver = new SectionSeddlePointSolver('function-box', 'a-box', 'b-box', 'solve-btn', 'solve-box')
+        solver.Solve()
+    </script>
+</body>
+</html>
