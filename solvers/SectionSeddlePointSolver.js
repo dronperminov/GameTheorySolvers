@@ -111,29 +111,30 @@ SectionSeddlePointSolver.prototype.Plot = function(a, b, p, f_a_y, f_b_y) {
     let y1 = []
     let y2 = []
 
+    let xi = a
     let h = b.sub(a).div(new Fraction('100'))
 
-    while (a.lt(b.add(h))) {
-        x.push(a.print(2))
+    while (xi.lt(b.add(h))) {
+        x.push(xi.print(2))
+        let v1 = f_b_y[''].add(f_b_y['y'].mult(xi)).add(f_b_y['y^2'].mult(xi).mult(xi)).print(2)
+        let v2 = f_a_y[''].add(f_a_y['y'].mult(xi)).add(f_a_y['y^2'].mult(xi).mult(xi)).print(2)
 
-        if (a.lt(p)) {
-            y.push(f_b_y[''].add(f_b_y['y'].mult(a)).add(f_b_y['y^2'].mult(a).mult(a)).print(2))
+        if (xi.lt(p)) {
+            y.push(v1)
         }
         else {
-            y.push(f_a_y[''].add(f_a_y['y'].mult(a)).add(f_a_y['y^2'].mult(a).mult(a)).print(2))
+            y.push(v2)
         }
 
-        let v1 = f_b_y[''].add(f_b_y['y'].mult(a)).add(f_b_y['y^2'].mult(a).mult(a)).print(2)
-        let v2 = f_a_y[''].add(f_a_y['y'].mult(a)).add(f_a_y['y^2'].mult(a).mult(a)).print(2)
         y1.push(v1)
         y2.push(v2)
 
-        a = a.add(h)
+        xi = xi.add(h)
     }
 
     let data = { x: x, y: y, mode: 'lines', name: 'F(x(y), y)'};
-    let data1 = { x: x, y: y1, mode: 'lines', name: 'F(a, y)'};
-    let data2 = { x: x, y: y2, mode: 'lines', name: 'F(b, y)'};
+    let data1 = { x: x, y: y1, mode: 'lines', name: `F(${a}, y)`};
+    let data2 = { x: x, y: y2, mode: 'lines', name: `F(${b}, y)`};
 
     let layout = {
         width: 500,
@@ -179,9 +180,21 @@ SectionSeddlePointSolver.prototype.Solve = function() {
         let f_a_y = { 'y^2': f['y^2'], 'y': f['xy'].mult(a), '': f['x^2'].mult(a).mult(a) }
         let f_b_y = { 'y^2': f['y^2'], 'y': f['xy'].mult(b), '': f['x^2'].mult(b).mult(b) }
 
+        let pa = f_a_y['y'].div(f_a_y['y^2'].mult(new Fraction('-2')))
+        let pb = f_b_y['y'].div(f_b_y['y^2'].mult(new Fraction('-2')))
+
         let p = f_a_y[''].sub(f_b_y['']).div(f_b_y['y'].sub(f_a_y['y']))
         let y0 = p
         let v_up = f_a_y[''].add(f_a_y['y'].mult(y0)).add(f_a_y['y^2'].mult(y0).mult(y0))
+
+        if (pa.gt(p)) {
+            y0 = pa
+            v_up = f_a_y[''].add(f_a_y['y'].mult(pa)).add(f_a_y['y^2'].mult(pa).mult(pa))
+        }
+        else if (pb.lt(p)) {
+            y0 = pb
+            v_up = f_b_y[''].add(f_b_y['y'].mult(pb)).add(f_b_y['y^2'].mult(pb).mult(pb))
+        }
 
         this.solveBox.innerHTML += `<p class='math'>v̲ = max<sub>x</sub> min<sub>y</sub> F(x, y)</p>`
         this.solveBox.innerHTML += `<p class='math'>y(x) = ${yx}x</p>`
@@ -192,14 +205,22 @@ SectionSeddlePointSolver.prototype.Solve = function() {
         this.solveBox.innerHTML += `x⁰ = ${x0}, v̲ = ${v_down}</p><br>`
         
         this.solveBox.innerHTML += `<p class='math'>v̅ = min<sub>y</sub> max<sub>x</sub> F(x, y)</p>`
-        this.solveBox.innerHTML += `<p class='math'>Минимум либо в ${a}, либо в ${b}:</p>`
+        this.solveBox.innerHTML += `<p class='math'>Max<sub>x</sub> либо в ${a}, либо в ${b}:</p>`
         this.solveBox.innerHTML += `<p class='math'>F(${a}, y) = ${this.PrintFunction(f_a_y)}</p>`
         this.solveBox.innerHTML += `<p class='math'>F(${b}, y) = ${this.PrintFunction(f_b_y)}</p>`
         this.solveBox.innerHTML += `<p class='math'>x(y) = { ${a}, y &ge; ${p}, иначе ${b} }</p>`
         this.solveBox.innerHTML += `<p class='math'>F(x(y), y) = { ${this.PrintFunction(f_a_y)}, y &ge; ${p}, иначе ${this.PrintFunction(f_b_y)} }</p>`
         this.solveBox.appendChild(this.Plot(a, b, p, f_a_y, f_b_y))
+        this.solveBox.innerHTML += `<p class='math'>У параболы F(${a}, y) вершина находится в ${pa}</p>`
+        this.solveBox.innerHTML += `<p class='math'>У параболы F(${b}, y) вершина находится в ${pb}</p>`
         this.solveBox.innerHTML += `y⁰ = ${y0}, v̅ = ${v_up}</p><br>`
 
+        if (v_down.eq(v_up)) {
+            this.solveBox.innerHTML += `<p class='math'>v̅ = v̲ = v → <b>имеется седловая точка</b>: (${x0}, ${y0})</p>`
+        }
+        else {
+            this.solveBox.innerHTML += `<p class='math'>v̅ ≠ v̲ → <b>седловых точек нет</b></p>`
+        }
     }
     catch (error) {
         alert(error)
