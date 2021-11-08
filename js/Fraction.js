@@ -223,3 +223,13 @@ Fraction.prototype.abs = function() {
 
     return result;
 }
+
+Fraction.prototype.neg = function() {
+    let result = new Fraction();
+
+    result.n = this.n;
+    result.m = this.m;
+    result.changeSign();
+
+    return result;
+}
