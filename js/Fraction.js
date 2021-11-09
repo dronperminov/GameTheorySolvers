@@ -233,3 +233,11 @@ Fraction.prototype.neg = function() {
 
     return result;
 }
+
+Fraction.prototype.signStr = function() {
+    let sign = '+ '
+    if (this.isNeg())
+        sign = '- '
+
+    return sign + this.abs().toString()
+}

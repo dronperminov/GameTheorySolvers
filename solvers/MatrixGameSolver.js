@@ -235,8 +235,8 @@ MatrixGameSolver.prototype.Solve = function() {
 
     let table = this.MakeMatrixTable(matrix)
 
-    let p = new Array(matrix[0].length).fill(new Fraction('0'))
-    let q = new Array(matrix.length).fill(new Fraction('0'))
+    let p = new Array(matrix.length).fill(new Fraction('0'))
+    let q = new Array(matrix[0].length).fill(new Fraction('0'))
     let v = new Fraction('0')
 
     this.solveBox.innerHTML = `<h2>Решение</h2>`
@@ -262,18 +262,18 @@ MatrixGameSolver.prototype.Solve = function() {
         q[indexes.columns[1]] = a11.sub(a21).div(den)
 
         this.solveBox.innerHTML += '<b>Решаем две системы уравнений</b>:<br>'
-        this.solveBox.appendChild(this.MakeSystem([`v = ${a11}p<sub>1</sub> + ${a21}p<sub>2</sub>`, `v = ${a12}p<sub>1</sub> + ${a22}p<sub>2</sub>`, `p<sub>1</sub> + p<sub>2</sub> = 1`]))
-        this.solveBox.appendChild(this.MakeSystem([`v = ${a11}q<sub>1</sub> + ${a12}q<sub>2</sub>`, `v = ${a21}q<sub>1</sub> + ${a22}q<sub>2</sub>`, `q<sub>1</sub> + q<sub>2</sub> = 1`]))
+        this.solveBox.appendChild(this.MakeSystem([`v = ${a11}p<sub>1</sub> ${a21.signStr()}p<sub>2</sub>`, `v = ${a12}p<sub>1</sub> ${a22.signStr()}p<sub>2</sub>`, `p<sub>1</sub> + p<sub>2</sub> = 1`]))
+        this.solveBox.appendChild(this.MakeSystem([`v = ${a11}q<sub>1</sub> ${a12.signStr()}q<sub>2</sub>`, `v = ${a21}q<sub>1</sub> ${a22.signStr()}q<sub>2</sub>`, `q<sub>1</sub> + q<sub>2</sub> = 1`]))
         this.solveBox.innerHTML += '<br>'
-        this.solveBox.innerHTML += `p<sub>1</sub> = 1 - p<sub>2</sub> → ${a11} - ${a11.sub(a21)}p<sub>2</sub> = ${a12} - ${a12.sub(a22)}p<sub>2</sub> → ${a11.sub(a12)} = ${a11.sub(a21).sub(a12.sub(a22))}p<sub>2</sub> → p<sub>2</sub> = ${p[indexes.rows[1]]}, p<sub>1</sub> = ${p[indexes.rows[0]]}<br>`
-        this.solveBox.innerHTML += `q<sub>1</sub> = 1 - q<sub>2</sub> → ${a11} - ${a11.sub(a12)}q<sub>2</sub> = ${a21} - ${a21.sub(a22)}q<sub>2</sub> → ${a11.sub(a21)} = ${a11.sub(a12).sub(a21.sub(a22))}q<sub>2</sub> → q<sub>2</sub> = ${q[indexes.columns[1]]}, q<sub>1</sub> = ${q[indexes.columns[0]]}<br>`
+        this.solveBox.innerHTML += `p<sub>1</sub> = 1 - p<sub>2</sub> → ${a11} ${a21.sub(a11).signStr()}p<sub>2</sub> = ${a12} ${a22.sub(a12).signStr()}p<sub>2</sub> → ${a11.sub(a12)} = ${a11.sub(a21).sub(a12.sub(a22))}p<sub>2</sub> → p<sub>2</sub> = ${p[indexes.rows[1]]}, p<sub>1</sub> = ${p[indexes.rows[0]]}<br>`
+        this.solveBox.innerHTML += `q<sub>1</sub> = 1 - q<sub>2</sub> → ${a11} ${a12.sub(a11).signStr()}q<sub>2</sub> = ${a21} ${a22.sub(a21).signStr()}q<sub>2</sub> → ${a11.sub(a21)} = ${a11.sub(a12).sub(a21.sub(a22))}q<sub>2</sub> → q<sub>2</sub> = ${q[indexes.columns[1]]}, q<sub>1</sub> = ${q[indexes.columns[0]]}<br>`
         this.solveBox.innerHTML += '<br>'
     }
     else {
         return // TODO
     }
 
-    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: ${p.join(', ')}<br>`
-    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: ${q.join(', ')}<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
     this.solveBox.innerHTML += `<b>Цена игры</b>: ${v}<br>`
 }
