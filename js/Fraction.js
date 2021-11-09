@@ -241,3 +241,15 @@ Fraction.prototype.signStr = function() {
 
     return sign + this.abs().toString()
 }
+
+Fraction.prototype.toFloat = function() {
+    return +this.print(2)
+}
+
+Fraction.prototype.min = function(fraction) {
+    return this.lt(fraction) ? this : fraction
+}
+
+Fraction.prototype.max = function(fraction) {
+    return this.gt(fraction) ? this : fraction
+}
