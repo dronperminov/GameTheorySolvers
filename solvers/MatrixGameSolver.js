@@ -575,7 +575,7 @@ MatrixGameSolver.prototype.MakeSubmatrixSystem = function(matrix, rows, columns,
     return system
 }
 
-MatrixGameSolver.prototype.GenerateColumnsSequences = function(i, n, m, sequence, sequences) {
+MatrixGameSolver.prototype.GenerateIndexesSequences = function(i, n, m, sequence, sequences) {
     if (i == n) {
         sequences.push(sequence.map((v) => v))
         return
@@ -585,13 +585,13 @@ MatrixGameSolver.prototype.GenerateColumnsSequences = function(i, n, m, sequence
 
     for (let j = start; j <= m - n + i; j++) {
         sequence[i] = j
-        this.GenerateColumnsSequences(i + 1, n, m, sequence, sequences)
+        this.GenerateIndexesSequences(i + 1, n, m, sequence, sequences)
     }
 }
 
-MatrixGameSolver.prototype.GetColumnsSequences = function(rows, columns) {
+MatrixGameSolver.prototype.GetIndexesSequences = function(rows, columns) {
     let sequences = []
-    this.GenerateColumnsSequences(0, rows, columns, [], sequences)
+    this.GenerateIndexesSequences(0, rows, columns, [], sequences)
     return sequences
 }
 
@@ -646,8 +646,15 @@ MatrixGameSolver.prototype.SolveSystem = function(matrix, header) {
     details.appendChild(summary)
     details.innerHTML += `<br>`
 
-    for (let i = 0; i < matrix.length; i++) {
+    let haveSolve = true
+
+    for (let i = 0; i < matrix.length && haveSolve; i++) {
         let imax = this.FindRowWithMinAbs(matrix, i)
+
+        if (imax == -1) {
+            haveSolve = false
+            break
+        }
 
         if (imax != i) {
             this.MoveRow(matrix, imax, i)
@@ -663,8 +670,15 @@ MatrixGameSolver.prototype.SolveSystem = function(matrix, header) {
         details.innerHTML += `<br>`
     }
 
+    if (!haveSolve) {
+        details.innerHTML += `Решения СЛАУ нет<br>`
+    }
+
     this.solveBox.innerHTML += `<br>`
     this.solveBox.appendChild(details)
+
+    if (!haveSolve)
+        return null
 
     let solve = []
 
@@ -746,50 +760,72 @@ MatrixGameSolver.prototype.CheckSolve = function(solve, matrix, rows, columns, v
 
 // число столбцов не меньше числа строк
 MatrixGameSolver.prototype.SolveSubmatrixSystem = function(matrix, indexes, p, q) {
-    let columnSequences = this.GetColumnsSequences(indexes.rows.length, indexes.columns.length)
+    for (let rowCount = indexes.rows.length; rowCount > 0; rowCount--) {
+        let rowSecuences = this.GetIndexesSequences(rowCount, indexes.rows.length)
 
-    for (let sequence of columnSequences) {
-        let columns = []
+        for (let rowSecuence of rowSecuences) {
+            let rows = []
 
-        for (let i = 0; i < indexes.rows.length; i++)
-            columns.push(indexes.columns[sequence[i]])
+            for (let i = 0; i < rowCount; i++)
+                rows.push(indexes.rows[rowSecuence[i]])
 
-        let system = this.MakeSubmatrixSystem(matrix, indexes.rows, columns)
-        let solve_q = this.SolveSystem(system, `<b>Решаем СЛАУ относительно q, используя столбцы ${columns.map((v) => v + 1).join(', ')}</b>:<br>`)
-        let vq = solve_q.pop()
+            let columnSequences = this.GetIndexesSequences(rowCount, indexes.columns.length)
 
-        for (let i = 0; i < q.length; i++)
-            q[i] = new Fraction('0')
+            for (let columnSequence of columnSequences) {
+                let columns = []
 
-        for (let i = 0; i < columns.length; i++)
-            q[columns[i]] = solve_q[i]
+                for (let i = 0; i < rowCount; i++)
+                    columns.push(indexes.columns[columnSequence[i]])
 
-        this.solveBox.innerHTML += `${solve_q.map((v, i) => 'q<sub>' + (i + 1) + '</sub> = ' + v).join(', ')}, v = ${vq}<br>`
-        this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
+                let system = this.MakeSubmatrixSystem(matrix, rows, columns)
+                let solve_q = this.SolveSystem(system, `<b>Решаем СЛАУ относительно q, используя строки ${rows.map((v) => v + 1).join(', ')} и столбцы ${columns.map((v) => v + 1).join(', ')}</b>:<br>`)
 
-        if (!this.CheckSolve(q, matrix, indexes.rows, indexes.columns, vq, false)) {
-            continue
+                if (solve_q === null)
+                    continue
+
+                let vq = solve_q.pop()
+
+                for (let i = 0; i < q.length; i++)
+                    q[i] = new Fraction('0')
+
+                for (let i = 0; i < columns.length; i++)
+                    q[columns[i]] = solve_q[i]
+
+                this.solveBox.innerHTML += `${solve_q.map((v, i) => 'q<sub>' + (i + 1) + '</sub> = ' + v).join(', ')}, v = ${vq}<br>`
+                this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
+
+                if (!this.CheckSolve(q, matrix, indexes.rows, indexes.columns, vq, false)) {
+                    continue
+                }
+
+                system = this.MakeSubmatrixSystem(matrix, rows, columns, true)
+                let solve_p = this.SolveSystem(system, `<b>Решаем СЛАУ относительно p, используя строки ${rows.map((v) => v + 1).join(', ')} и столбцы ${columns.map((v) => v + 1).join(', ')}</b>:<br>`)
+
+                if (solve_p === null)
+                    continue
+
+                let vp = solve_p.pop()
+
+                for (let i = 0; i < p.length; i++)
+                    p[i] = new Fraction('0')
+
+                for (let i = 0; i < rows.length; i++)
+                    p[rows[i]] = solve_p[i]
+
+                this.solveBox.innerHTML += `${solve_p.map((v, i) => 'p<sub>' + (i + 1) + '</sub> = ' + v).join(', ')}, v = ${vp}<br>`
+                this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
+
+                if (!this.CheckSolve(p, matrix, indexes.rows, indexes.columns, vp, true)) {
+                    continue
+                }
+
+                this.solveBox.innerHTML += `<br><b>Ответ:</b><br>`
+                this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
+                this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
+                this.solveBox.innerHTML += `<b>Цена игры</b>: ${vp}<br>`
+                return
+            }
         }
-
-        system = this.MakeSubmatrixSystem(matrix, indexes.rows, columns, true)
-        let solve_p = this.SolveSystem(system, `<b>Решаем СЛАУ относительно p, используя столбцы ${columns.map((v) => v + 1).join(', ')}</b>:<br>`)
-        let vp = solve_p.pop()
-
-        for (let i = 0; i < p.length; i++)
-            p[i] = new Fraction('0')
-
-        for (let i = 0; i < indexes.rows.length; i++)
-            p[indexes.rows[i]] = solve_p[i]
-
-        this.solveBox.innerHTML += `${solve_p.map((v, i) => 'p<sub>' + (i + 1) + '</sub> = ' + v).join(', ')}, v = ${vp}<br>`
-        this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
-
-        if (!this.CheckSolve(p, matrix, indexes.rows, indexes.columns, vp, true)) {
-            continue
-        }
-
-        this.solveBox.innerHTML += `<b>Цена игры</b>: ${vp}<br>`
-        break
     }
 }
 
