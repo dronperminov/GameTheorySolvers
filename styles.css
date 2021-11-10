@@ -22,6 +22,7 @@
     font-size: 18px;
     resize: vertical;
     min-height: 100px;
+    vertical-align: top;
 }
 
 .solver input[type="number"] {
