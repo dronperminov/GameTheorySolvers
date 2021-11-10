@@ -105,6 +105,7 @@ SectionSeddlePointSolver.prototype.PrintFunction = function(f) {
 
 SectionSeddlePointSolver.prototype.Plot = function(a, b, p, f_a_y, f_b_y) {
     let div = document.createElement('div')
+    div.id = 'plot'
 
     let x = []
     let y = []
@@ -112,7 +113,7 @@ SectionSeddlePointSolver.prototype.Plot = function(a, b, p, f_a_y, f_b_y) {
     let y2 = []
 
     let xi = a
-    let h = b.sub(a).div(new Fraction('100'))
+    let h = new Fraction('1/1000')
 
     while (xi.lt(b.add(h))) {
         x.push(xi.print(2))
@@ -145,9 +146,8 @@ SectionSeddlePointSolver.prototype.Plot = function(a, b, p, f_a_y, f_b_y) {
         }
     };
 
-    Plotly.newPlot(div, [data1, data2, data], layout);
-
-    return div
+    this.solveBox.appendChild(div)
+    return { data: [data1, data2, data], layout: layout }
 }
 
 SectionSeddlePointSolver.prototype.SolveXX_XY_YY = function(f, a, b) {
@@ -187,7 +187,7 @@ SectionSeddlePointSolver.prototype.SolveXX_XY_YY = function(f, a, b) {
     this.solveBox.innerHTML += `<p class='math'>F(${b}, y) = ${this.PrintFunction(f_b_y)}</p>`
     this.solveBox.innerHTML += `<p class='math'>x(y) = { ${a}, y &ge; ${p}, иначе ${b} }</p>`
     this.solveBox.innerHTML += `<p class='math'>F(x(y), y) = { ${this.PrintFunction(f_a_y)}, y &ge; ${p}, иначе ${this.PrintFunction(f_b_y)} }</p>`
-    this.solveBox.appendChild(this.Plot(a, b, p, f_a_y, f_b_y))
+    let plot = this.Plot(a, b, p, f_a_y, f_b_y)
     this.solveBox.innerHTML += `<p class='math'>У параболы F(${a}, y) вершина находится в ${pa}</p>`
     this.solveBox.innerHTML += `<p class='math'>У параболы F(${b}, y) вершина находится в ${pb}</p>`
     if (pa.gt(p)) {
@@ -209,6 +209,8 @@ SectionSeddlePointSolver.prototype.SolveXX_XY_YY = function(f, a, b) {
     else {
         this.solveBox.innerHTML += `<p class='math'>v̅ ≠ v̲ → <b>седловых точек нет</b></p>`
     }
+
+    Plotly.newPlot('plot', plot.data, plot.layout);
 }
 
 SectionSeddlePointSolver.prototype.EvaluateF = function(f, x0, y0) {
