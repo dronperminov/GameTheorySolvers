@@ -331,14 +331,17 @@ MatrixGameSolver.prototype.GetEnvelopeOfLines = function(lines, x, isMin) {
     return y
 }
 
-MatrixGameSolver.prototype.ArgMaxOfPoints = function(points, lines, isP) {
-    let imax = 0
-    let ymax = this.GetEnvelopeOfLines(lines, points[0], isP)
+MatrixGameSolver.prototype.ArgMaxOfPoints = function(points, intersectionPoints, lines, isP) {
+    let imax = -1
+    let ymax = null
 
-    for (let i = 1; i < points.length; i++) {
+    for (let i = 0; i < points.length; i++) {
         let y = this.GetEnvelopeOfLines(lines, points[i], isP)
 
-        if ((y.gt(ymax) && isP) || (y.lt(ymax) && !isP)) {
+        if (i < points.length - 2 && !intersectionPoints[i].y.eq(y))
+            continue
+
+        if (imax == -1 || (y.gt(ymax) && isP) || (y.lt(ymax) && !isP)) {
             imax = i
             ymax = y
         }
@@ -424,10 +427,10 @@ MatrixGameSolver.prototype.GetLinesForFind = function(lines, x, y, points) {
         let j1 = points[i].i
         let j2 = points[i].j
 
-        if (lines[j1].k.isPos() && lines[j2].k.isNeg())
+        if (!lines[j1].k.isNeg() && !lines[j2].k.isPos())
             return { j1: j1, j2: j2 }
 
-        if (lines[j2].k.isPos() && lines[j1].k.isNeg())
+        if (!lines[j2].k.isNeg() && !lines[j1].k.isPos())
             return { j1: j2, j2: j1 }
     }
 
@@ -455,7 +458,7 @@ MatrixGameSolver.prototype.SolveGraphically2xN = function(matrix, indexes, p, q)
     ps.push(zero)
     ps.push(one)
 
-    let argmax = this.ArgMaxOfPoints(ps, lines, true)
+    let argmax = this.ArgMaxOfPoints(ps, points, lines, true)
     let p1 = ps[argmax.i]
     let p2 = one.sub(p1)
     let v = argmax.v
@@ -475,7 +478,7 @@ MatrixGameSolver.prototype.SolveGraphically2xN = function(matrix, indexes, p, q)
         q[indexes.columns[j1]] = q_star
         q[indexes.columns[j2]] = one.sub(q_star)
 
-        this.solveBox.innerHTML += `Искомая точка является пересечением прямых l<sub>${j1 + 1}</sub> и l<sub>${j2 + 1}</sub>, q<sup>*</sup> = ${q_star}<br>`
+        this.solveBox.innerHTML += `Искомая точка является пересечением прямых l<sub>${j1 + 1}</sub> и l<sub>${j2 + 1}</sub>, q<sup>*</sup> = k<sub>l<sub>${j2 + 1}</sub></sub> / (k<sub>l<sub>${j2 + 1}</sub></sub> - k<sub>l<sub>${j1 + 1}</sub></sub>) = ${lines[j2].k} : (${lines[j2].k} ${lines[j1].k.neg().signStr()}) = ${q_star}<br>`
     }
     else {
         let j = this.GetLineForBorder(lines, p1, v)
@@ -509,7 +512,7 @@ MatrixGameSolver.prototype.SolveGraphicallyNx2 = function(matrix, indexes, p, q)
     qs.push(zero)
     qs.push(one)
 
-    let argmax = this.ArgMaxOfPoints(qs, lines, false)
+    let argmax = this.ArgMaxOfPoints(qs, points, lines, false)
     let q1 = qs[argmax.i]
     let q2 = one.sub(q1)
     let v = argmax.v
@@ -529,7 +532,7 @@ MatrixGameSolver.prototype.SolveGraphicallyNx2 = function(matrix, indexes, p, q)
         p[indexes.rows[j1]] = p_star
         p[indexes.rows[j2]] = one.sub(p_star)
 
-        this.solveBox.innerHTML += `Искомая точка является пересечением прямых l<sub>${j1 + 1}</sub> и l<sub>${j2 + 1}</sub>, p<sup>*</sup> = ${p_star}<br>`
+        this.solveBox.innerHTML += `Искомая точка является пересечением прямых l<sub>${j1 + 1}</sub> и l<sub>${j2 + 1}</sub>, p<sup>*</sup> = k<sub>l<sub>${j2 + 1}</sub></sub> / (k<sub>l<sub>${j2 + 1}</sub></sub> - k<sub>l<sub>${j1 + 1}</sub></sub>) = ${lines[j2].k} : (${lines[j2].k} ${lines[j1].k.neg().signStr()}) = ${p_star}<br>`
     }
     else {
         let j = this.GetLineForBorder(lines, q1, v)
