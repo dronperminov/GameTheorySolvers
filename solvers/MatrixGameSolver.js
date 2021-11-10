@@ -841,6 +841,42 @@ MatrixGameSolver.prototype.SolveSubmatrixSystem = function(matrix, indexes, p, q
     }
 }
 
+MatrixGameSolver.prototype.IsCyclicMatrix = function(matrix, rows, columns) {
+    if (rows.length != columns.length)
+        return false
+
+    for (let i = 1; i < rows.length; i++)
+        for (let j = 0; j < columns.length; j++)
+            if (!matrix[rows[i]][columns[j]].eq(matrix[rows[0]][columns[(j + columns.length - i) % columns.length]]))
+                return false
+
+    return true
+}
+
+MatrixGameSolver.prototype.SolveCyclic = function(matrix, indexes, p, q) {
+    this.solveBox.innerHTML += `Матрица циклическая → p<sub>i</sub> = q<sub>j</sub> = 1 / ${indexes.rows.length}<br>`
+
+    let v = new Fraction('0')
+
+    for (let i = 0; i < indexes.rows.length; i++) {
+        p[indexes.rows[i]] = new Fraction(`1/${indexes.rows.length}`)
+        q[indexes.columns[i]] = new Fraction(`1/${indexes.columns.length}`)
+        v = v.add(matrix[indexes.rows[0]][indexes.columns[i]])
+    }
+
+    v = v.div(new Fraction(`${indexes.rows.length}`))
+
+    this.CheckSolve(q, matrix, indexes.rows, indexes.columns, v, false)
+    this.CheckSolve(p, matrix, indexes.rows, indexes.columns, v, true)
+
+    this.solveBox.innerHTML += '<br>'
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Цена игры</b>: ${v}<br>`
+
+    return v
+}
+
 MatrixGameSolver.prototype.SolveMatrix = function(matrix) {
     let table = this.MakeMatrixTable(matrix)
 
@@ -856,6 +892,9 @@ MatrixGameSolver.prototype.SolveMatrix = function(matrix) {
 
     if (indexes.rows.length == 2 && indexes.columns.length == 2) {
         v = this.Solve2x2(matrix, indexes, p, q)
+    }
+    else if (this.IsCyclicMatrix(matrix, indexes.rows, indexes.columns)) {
+        v = this.SolveCyclic(matrix, indexes, p, q)
     }
     else if (indexes.rows.length == 2) {
         v = this.SolveGraphically2xN(matrix, indexes, p, q)
