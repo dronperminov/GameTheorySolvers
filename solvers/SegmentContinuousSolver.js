@@ -62,6 +62,57 @@ SegmentContinuousSolver.prototype.F = function(x, y) {
     return dx.mult(dx).neg().add(y.mult(y)).add(this.y2.mult(y)).add(this.c2)
 }
 
+SegmentContinuousSolver.prototype.PlotFunction = function(a, b, n = 100) {
+    let h = b.sub(a).div(new Fraction(`${n}`))
+    let z = []
+
+    let x = []
+    let y = []
+
+    for (let i = 0; i <= n; i++) {
+        let p = a.add(h.mult(new Fraction(`${i}`)))
+        x.push(p)
+        y.push(p)
+    }
+
+    for (let i = 0; i <= n; i++) {
+        z[i] = []
+
+        for (let j = 0; j <= n; j++)
+            z[i][j] = this.F(x[i], y[j]).toFloat()
+    }
+
+    let layout = {
+        width: 500,
+        height: 400,
+        margin: { l: 20, r: 20, b: 20, t: 20 },
+    };
+
+    let data = { x: x.map((v) => v.toFloat()), y: y.map((v) => v.toFloat()), z: z, type: 'surface'}
+    Plotly.newPlot('plot-fxy', [data], layout)
+}
+
+SegmentContinuousSolver.prototype.PlotFunctionX = function(a, b, y0, n = 100) {
+    let h = b.sub(a).div(new Fraction(`${n}`))
+
+    let x = []
+    let y = []
+
+    for (let i = 0; i <= n; i++) {
+        x.push(a.add(h.mult(new Fraction(`${i}`))))
+        y.push(this.F(x[i], y0))
+    }
+
+    let layout = {
+        width: 500,
+        height: 400,
+        margin: { l: 20, r: 20, b: 20, t: 20 },
+    };
+
+    let data = { x: x.map((v) => v.toFloat()), y: y.map((v) => v.toFloat()), mode: 'lines'}
+    Plotly.newPlot('plot-fx', [data], layout)
+}
+
 SegmentContinuousSolver.prototype.Solve = function() {
     this.x1 = new Fraction(this.x1Box.value)
     this.y1 = new Fraction(this.y1Box.value)
@@ -78,6 +129,10 @@ SegmentContinuousSolver.prototype.Solve = function() {
     this.solveBox.innerHTML += `<b>Введённые данные:</b><br>`
     this.ShowInputFunction()
     this.solveBox.innerHTML += `X = Y = [${a}, ${b}]<br><br>`
+
+    let plot = document.createElement('div')
+    plot.id = 'plot-fxy'
+    this.solveBox.appendChild(plot)
 
     this.solveBox.innerHTML += `F(x<sub>1</sub>, y) = F(x<sub>2</sub>, y), x<sub>1</sub> &le; y &le; x<sub>2</sub><br><br>`
 
@@ -157,6 +212,10 @@ SegmentContinuousSolver.prototype.Solve = function() {
     this.solveBox.innerHTML += `<br>Максимальное значение F̅(s, t) = ${f_max} достигается при s = ${s_max} и t = ${t_max}</b><br>`
     this.solveBox.innerHTML += `<b>Подставляем замену</b>: x<sub>1</sub> = max(${a}, min(${b}, ${x1})) = ${x1_norm}, x<sub>2</sub> = max(${a}, min(${b}, ${x2})) = ${x2_norm}, <b>y<sub>0</sub> = ${y0}</b>, <b>v = ${v}<br>`
 
+    let plotFx = document.createElement('div')
+    plotFx.id = 'plot-fx'
+    this.solveBox.appendChild(plotFx)
+
     let c1 = this.c1.sub(a.sub(this.x1).square())
     let c2 = this.c2.sub(b.sub(this.x2).square())
 
@@ -178,4 +237,7 @@ SegmentContinuousSolver.prototype.Solve = function() {
     this.solveBox.innerHTML += `<b>v = ${v}</b><br>`
     this.solveBox.innerHTML += `<b>y<sub>0</sub> = ${y0}</b><br>`
     this.solveBox.innerHTML += `<b>pΦ<sub>0</sub> = ${p}I<sub>0</sub> + ${q}I<sub>1</sub></b><br>`
+
+    this.PlotFunction(a, b)
+    this.PlotFunctionX(a, b, y0)
 }
