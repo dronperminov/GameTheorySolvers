@@ -6,41 +6,6 @@ function SeddlePointSolver(matrixBoxId, buttonId, solveBoxId) {
     this.button.addEventListener('click', () => this.Solve())
 }
 
-SeddlePointSolver.prototype.ParseMatrix = function() {
-    let content = this.matrixBox.value
-    let rows = content.split('\n')
-
-    if (rows.length < 1)
-        throw "Матрица не введена"
-
-    let matrix = []
-    let columns = -1
-
-    for (let i = 0; i < rows.length; i++) {
-        let row = rows[i].trim().split(/\s+/)
-
-        if (i == 0) {
-            columns = row.length
-        }
-        else if (row.length != columns) {
-            throw `Некорректное количество столбцов в строке ${i + 1}. Ожидалось ${columns}, а получено ${row.length}`
-        }
-
-        matrix.push([])
-
-        for (let j = 0; j < columns; j++) {
-            let value = +row[j]
-
-            if (row[j] == '' || isNaN(value))
-                throw `Некорректное значение в строке ${i + 1}: ${row[j]} (столбец ${j + 1})`
-
-            matrix[i].push(value)
-        }
-    }
-
-    return matrix
-}
-
 SeddlePointSolver.prototype.AppendTableCell = function(row, value, color = null, asBorder = true) {
     let cell = document.createElement('div')
     cell.className = 'matrix-cell'
@@ -84,14 +49,15 @@ SeddlePointSolver.prototype.MakeMatrixTable = function(matrix, mins, maxs) {
         for (let j = 0; j < matrix[i].length; j++) {
             let color = null
 
-            if (maxs[j] == matrix[i][j] && mins[i] == matrix[i][j]) {
+            if (maxs[j].eq(matrix[i][j]) && mins[i].eq(matrix[i][j])) {
                 color = 'rgb(0, 173, 86)'
             }
-            else if (maxs[j] == matrix[i][j]) {
+            else if (maxs[j].eq(matrix[i][j])) {
                 color = maxColor
             }
-            else if (mins[i] == matrix[i][j])
+            else if (mins[i].eq(matrix[i][j])) {
                 color = minColor
+            }
 
             this.AppendTableCell(tr, matrix[i][j], color)
         }
@@ -125,7 +91,7 @@ SeddlePointSolver.prototype.MaxInColumns = function(matrix) {
         maxs[j] = matrix[0][j]
 
         for (let i = 1; i < matrix.length; i++)
-            maxs[j] = Math.max(maxs[j], matrix[i][j])
+            maxs[j] = maxs[j].max(matrix[i][j])
     }
 
     return maxs
@@ -138,17 +104,35 @@ SeddlePointSolver.prototype.MinInRows = function(matrix) {
         mins[i] = matrix[i][0]
 
         for (let j = 1; j < matrix[i].length; j++)
-            mins[i] = Math.min(mins[i], matrix[i][j])
+            mins[i] = mins[i].min(matrix[i][j])
     }
 
     return mins
+}
+
+SeddlePointSolver.prototype.MinValue = function(array) {
+    let min = array[0]
+
+    for (let i = 1; i < array.length; i++)
+        min = min.min(array[i])
+
+    return min
+}
+
+SeddlePointSolver.prototype.MaxValue = function(array) {
+    let max = array[0]
+
+    for (let i = 1; i < array.length; i++)
+        max = max.max(array[i])
+
+    return max
 }
 
 SeddlePointSolver.prototype.GetStrategy = function(extremums, value) {
     let strategy = []
 
     for (let i = 0; i < extremums.length; i++)
-        if (extremums[i] == value)
+        if (extremums[i].eq(value))
             strategy.push(i + 1)
 
     return strategy
@@ -156,15 +140,15 @@ SeddlePointSolver.prototype.GetStrategy = function(extremums, value) {
 
 SeddlePointSolver.prototype.Solve = function() {
     try {
-        let matrix = this.ParseMatrix()
+        let matrix = ParseMatrix(this.matrixBox.value)
         let rows = matrix.length
         let columns = matrix[0].length
 
         let maxs = this.MaxInColumns(matrix)
         let mins = this.MinInRows(matrix)
 
-        let v_down = Math.max(...mins)
-        let v_up = Math.min(...maxs)
+        let v_down = this.MaxValue(mins)
+        let v_up = this.MinValue(maxs)
 
         let x_strategy = this.GetStrategy(mins, v_down)
         let y_strategy = this.GetStrategy(maxs, v_up)

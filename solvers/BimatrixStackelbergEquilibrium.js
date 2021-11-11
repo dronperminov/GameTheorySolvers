@@ -7,45 +7,6 @@ function BimatrixStackelbergEquilibrium(matrixBox1Id, matrixBox2Id, buttonId, so
     this.button.addEventListener('click', () => this.Solve())
 }
 
-BimatrixStackelbergEquilibrium.prototype.ParseMatrix = function(box) {
-    let content = box.value
-    let rows = content.split('\n')
-
-    if (rows.length < 1)
-        throw "Матрица не введена"
-
-    let matrix = []
-    let columns = -1
-
-    for (let i = 0; i < rows.length; i++) {
-        let row = rows[i].trim().split(/\s+/)
-
-        if (i == 0) {
-            columns = row.length
-        }
-        else if (row.length != columns) {
-            throw `Некорректное количество столбцов в строке ${i + 1}. Ожидалось ${columns}, а получено ${row.length}`
-        }
-
-        matrix.push([])
-
-        for (let j = 0; j < columns; j++) {
-            let value
-
-            try {
-                value = new Fraction(row[j])
-            }
-            catch (error) {
-                throw `Некорректное значение в строке ${i + 1}: ${row[j]} (столбец ${j + 1})`
-            }
-
-            matrix[i].push(value)
-        }
-    }
-
-    return matrix
-}
-
 BimatrixStackelbergEquilibrium.prototype.ArgmaxAtRow = function(matrix, row) {
     let imax = 0
     let imaxs = [0]
@@ -85,8 +46,8 @@ BimatrixStackelbergEquilibrium.prototype.FindPoints = function(matrix, value) {
 }
 
 BimatrixStackelbergEquilibrium.prototype.Solve = function() {
-    let matrix1 = this.ParseMatrix(this.matrix1Box)
-    let matrix2 = this.ParseMatrix(this.matrix2Box)
+    let matrix1 = ParseMatrix(this.matrix1Box.value)
+    let matrix2 = ParseMatrix(this.matrix2Box.value)
 
     if (matrix1.length != matrix2.length || matrix1[0].length != matrix2[0].length)
         throw "Размеры матриц должны совпадать"
