@@ -110,7 +110,10 @@ FullInformationGameSolver.prototype.EvaluateCoordinates = function(node, level, 
     node.color = '#000'
     node.isMin = null
     node.level = level
-    node.pathIndex = 2 - (index % 2)
+
+    let id = index - (1 << level) + 1
+
+    node.pathIndex = (id % 8) % 2 + Math.floor((id % 8) / 4) * 2 + 1
 
     if (level == height - 1)
         return
@@ -251,11 +254,11 @@ FullInformationGameSolver.prototype.FindStrategies = function(node, level, strat
     }
 
     if (node.value.eq(node.left.value)) {
-        this.FindStrategies(node.left, level + 1, strategy.concat([1]), strategies)
+        this.FindStrategies(node.left, level + 1, strategy.concat([node.left.pathIndex]), strategies)
     }
 
     if (node.value.eq(node.right.value)) {
-        this.FindStrategies(node.right, level + 1, strategy.concat([2]), strategies)
+        this.FindStrategies(node.right, level + 1, strategy.concat([node.right.pathIndex]), strategies)
     }
 }
 
@@ -299,6 +302,7 @@ FullInformationGameSolver.prototype.Solve = function() {
         this.solveBox.innerHTML += `<b>Оптимальные стратегии игроков:</b><br>`
 
         let strategies = []
+        this.EvaluateCoordinates(tree, 0, this.TreeHeight(tree), 0)
         this.FindStrategies(tree, 0, [], strategies)
 
         for (let i = 0; i < strategies.length; i++)
