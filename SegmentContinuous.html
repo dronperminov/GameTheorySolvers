@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Решение непрерывной игры на отрезке | Решатели по курсу "Теория игр"</title>
+</head>
+<body>
+    <div class="content">
+        <h1>Решение непрерывной игры на отрезке</h1>
+        <div class="solver seddle-point-solver">
+            <table>
+                <tr>
+                    <td>f(x, y) = </td>
+                    <td>
+                        <div class="system">
+                            <div class="system-cell">-(x - <input type="number" id="x1-box" value="-1">)<sup>2</sup> + y<sup>2</sup> + <input type="number" id="y1-box" value="3">y + <input type="number" id="c1-box" value="3.75">, x &le; y</div>
+                            <div class="system-cell">&nbsp;</div>
+                            <div class="system-cell">-(x - <input type="number" id="x2-box" value="1.5">)<sup>2</sup> + y<sup>2</sup> + <input type="number" id="y2-box" value="-2">y + <input type="number" id="c2-box" value="5">, x &ge; y</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div><label>Отрезок: <input type="number" id="a-box" value="0"> <input type="number" id="b-box" value="1"></label></div>
+
+            <div class="button" id="solve-btn">Решить</div>
+            <div id="solve-box" class="solve"></div>
+        </div>
+    </div>
+
+    <script src="js/BigInteger.min.js"></script>
+    <script src="js/Fraction.js"></script>
+    <script src="js/plotly.min.js"></script>
+    <script src="solvers/SegmentContinuousSolver.js"></script>
+    <script>
+        let solver = new SegmentContinuousSolver('x1-box', 'y1-box', 'c1-box', 'x2-box', 'y2-box', 'c2-box', 'a-box', 'b-box', 'solve-btn', 'solve-box')
+        solver.Solve()
+    </script>
+</body>
+</html>

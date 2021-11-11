@@ -208,6 +208,16 @@ Fraction.prototype.lt = function(b) {
     return this.sub(b).isNeg();
 }
 
+// дробь меньше или равна
+Fraction.prototype.le = function(b) {
+    return this.lt(b) || this.eq(b)
+}
+
+// дробь больше или равна
+Fraction.prototype.ge = function(b) {
+    return this.gt(b) || this.eq(b)
+}
+
 Fraction.prototype.eq = function(b) {
     return this.n.equals(b.n) && this.m.equals(b.m);
 }
@@ -232,6 +242,44 @@ Fraction.prototype.neg = function() {
     result.changeSign();
 
     return result;
+}
+
+Fraction.prototype.square = function() {
+    return this.mult(this)
+}
+
+Fraction.prototype.isSquareNum = function(n) {
+    let i = bigInt.one;
+
+    while (!i.eq(n) && !i.multiply(i).eq(n)) {
+        i = i.add(bigInt.one)
+    }
+
+    return i.multiply(i).eq(n)
+}
+
+Fraction.prototype.getIntegerRoot = function(n) {
+    let i = bigInt.one;
+
+    while (!i.multiply(i).eq(n)) {
+        i = i.add(bigInt.one)
+    }
+
+    return i
+}
+
+Fraction.prototype.sqrt = function() {
+    if (this.isSquareNum(this.n) && this.isSquareNum(this.m)) {
+        let result = new Fraction()
+        result.n = this.getIntegerRoot(this.n)
+        result.m = this.getIntegerRoot(this.m)
+        result.reduce()
+        return result
+    }
+
+    alert('Внимание, корень посчитан через жопу (не точно)')
+    let value = +this.print(2, 20)
+    return new Fraction(Math.sqrt(value) + '')
 }
 
 Fraction.prototype.signStr = function() {
