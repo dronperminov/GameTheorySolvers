@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Решение и оптимальные стратегии в игре с полной информацией | Решатели по курсу "Теория игр"</title>
+</head>
+<body>
+    <div class="content">
+        <h1>Решение и оптимальные стратегии в игре с полной информацией</h1>
+        <div class="solver seddle-point-solver">
+            <div>
+            <textarea id="matrix-input-box" rows="7" cols="25" placeholder="Вставьте матрицу в это поле">8 -3 1 6
+3 3 -4 4
+-1 5 2 3
+7 3 -3 6</textarea>
+        </div>
+
+            <div class="button" id="solve-btn">Решить</div>
+            <div id="solve-box" class="solve"></div>
+        </div>
+    </div>
+
+    <script src="js/BigInteger.min.js"></script>
+    <script src="js/Fraction.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="solvers/FullInformationGameSolver.js"></script>
+    <script>
+        let solver = new FullInformationGameSolver('matrix-input-box', 'solve-btn', 'solve-box')
+        solver.Solve()
+    </script>
+</body>
+</html>
