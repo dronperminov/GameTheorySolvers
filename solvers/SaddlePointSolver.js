@@ -1,4 +1,4 @@
-function SeddlePointSolver(matrixBoxId, buttonId, solveBoxId) {
+function SaddlePointSolver(matrixBoxId, buttonId, solveBoxId) {
     this.matrixBox = document.getElementById(matrixBoxId)
     this.button = document.getElementById(buttonId)
     this.solveBox = document.getElementById(solveBoxId)
@@ -6,7 +6,7 @@ function SeddlePointSolver(matrixBoxId, buttonId, solveBoxId) {
     this.button.addEventListener('click', () => this.Solve())
 }
 
-SeddlePointSolver.prototype.AppendTableCell = function(row, value, color = null, asBorder = true) {
+SaddlePointSolver.prototype.AppendTableCell = function(row, value, color = null, asBorder = true) {
     let cell = document.createElement('div')
     cell.className = 'matrix-cell'
 
@@ -30,7 +30,7 @@ SeddlePointSolver.prototype.AppendTableCell = function(row, value, color = null,
     row.appendChild(cell)
 }
 
-SeddlePointSolver.prototype.MakeMatrixTable = function(matrix, mins, maxs) {
+SaddlePointSolver.prototype.MakeMatrixTable = function(matrix, mins, maxs) {
     let table = document.createElement('div')
     let minBlocks = document.createElement('div')
     let maxBlocks = document.createElement('div')
@@ -84,7 +84,7 @@ SeddlePointSolver.prototype.MakeMatrixTable = function(matrix, mins, maxs) {
     return block
 }
 
-SeddlePointSolver.prototype.MaxInColumns = function(matrix) {
+SaddlePointSolver.prototype.MaxInColumns = function(matrix) {
     let maxs = []
 
     for (let j = 0; j < matrix[0].length; j++) {
@@ -97,7 +97,7 @@ SeddlePointSolver.prototype.MaxInColumns = function(matrix) {
     return maxs
 }
 
-SeddlePointSolver.prototype.MinInRows = function(matrix) {
+SaddlePointSolver.prototype.MinInRows = function(matrix) {
     let mins = []
 
     for (let i = 0; i < matrix.length; i++) {
@@ -110,7 +110,7 @@ SeddlePointSolver.prototype.MinInRows = function(matrix) {
     return mins
 }
 
-SeddlePointSolver.prototype.MinValue = function(array) {
+SaddlePointSolver.prototype.MinValue = function(array) {
     let min = array[0]
 
     for (let i = 1; i < array.length; i++)
@@ -119,7 +119,7 @@ SeddlePointSolver.prototype.MinValue = function(array) {
     return min
 }
 
-SeddlePointSolver.prototype.MaxValue = function(array) {
+SaddlePointSolver.prototype.MaxValue = function(array) {
     let max = array[0]
 
     for (let i = 1; i < array.length; i++)
@@ -128,7 +128,7 @@ SeddlePointSolver.prototype.MaxValue = function(array) {
     return max
 }
 
-SeddlePointSolver.prototype.GetStrategy = function(extremums, value) {
+SaddlePointSolver.prototype.GetStrategy = function(extremums, value) {
     let strategy = []
 
     for (let i = 0; i < extremums.length; i++)
@@ -138,7 +138,7 @@ SeddlePointSolver.prototype.GetStrategy = function(extremums, value) {
     return strategy
 }
 
-SeddlePointSolver.prototype.Solve = function() {
+SaddlePointSolver.prototype.Solve = function() {
     try {
         let matrix = ParseMatrix(this.matrixBox.value)
         let rows = matrix.length

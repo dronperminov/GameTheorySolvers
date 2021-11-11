@@ -1,4 +1,4 @@
-function SectionSeddlePointSolver(functionBoxId, aBoxId, bBoxId, buttonId, solveBoxId) {
+function SectionSaddlePointSolver(functionBoxId, aBoxId, bBoxId, buttonId, solveBoxId) {
     this.functionBox = document.getElementById(functionBoxId)
 
     this.aBox = document.getElementById(aBoxId)
@@ -10,7 +10,7 @@ function SectionSeddlePointSolver(functionBoxId, aBoxId, bBoxId, buttonId, solve
     this.button.addEventListener('click', () => this.Solve())
 }
 
-SectionSeddlePointSolver.prototype.ParseFunction = function() {
+SectionSaddlePointSolver.prototype.ParseFunction = function() {
     let expression = this.functionBox.value.replace(/[\s*]/gi, '')
     let tokens = expression.match(/[-+]?((\d+\/\d+)|(\d+((\.|\,)\d+)?))?(x\^2|y\^2|xy|x|y)?/gi)
 
@@ -65,7 +65,7 @@ SectionSeddlePointSolver.prototype.ParseFunction = function() {
     return parts
 }
 
-SectionSeddlePointSolver.prototype.JoinTokens = function(tokens) {
+SectionSaddlePointSolver.prototype.JoinTokens = function(tokens) {
     let resultTokens = []
 
     tokens.sort((a, b) => b[1].length - a[1].length)
@@ -90,7 +90,7 @@ SectionSeddlePointSolver.prototype.JoinTokens = function(tokens) {
     return resultTokens.join('')
 }
 
-SectionSeddlePointSolver.prototype.PrintFunction = function(f) {
+SectionSaddlePointSolver.prototype.PrintFunction = function(f) {
     let tokens = []
 
     for (let arg of ['x^2', 'x', 'xy', 'y', 'y^2', '']) {
@@ -103,7 +103,7 @@ SectionSeddlePointSolver.prototype.PrintFunction = function(f) {
     return this.JoinTokens(tokens)
 }
 
-SectionSeddlePointSolver.prototype.Plot = function(a, b, p, f_a_y, f_b_y) {
+SectionSaddlePointSolver.prototype.Plot = function(a, b, p, f_a_y, f_b_y) {
     let div = document.createElement('div')
     div.id = 'plot'
 
@@ -150,7 +150,7 @@ SectionSeddlePointSolver.prototype.Plot = function(a, b, p, f_a_y, f_b_y) {
     return { data: [data1, data2, data], layout: layout }
 }
 
-SectionSeddlePointSolver.prototype.SolveXX_XY_YY = function(f, a, b) {
+SectionSaddlePointSolver.prototype.SolveXX_XY_YY = function(f, a, b) {
     let yx = f['xy'].div(f['y^2'].mult(new Fraction('-2')))
 
     let f_x_yx1 = f['x^2']
@@ -213,7 +213,7 @@ SectionSeddlePointSolver.prototype.SolveXX_XY_YY = function(f, a, b) {
     Plotly.newPlot('plot', plot.data, plot.layout);
 }
 
-SectionSeddlePointSolver.prototype.EvaluateF = function(f, x0, y0) {
+SectionSaddlePointSolver.prototype.EvaluateF = function(f, x0, y0) {
     let xx = f['x^2'].mult(x0).mult(x0)
     let yy = f['y^2'].mult(y0).mult(y0)
     let xy = f['xy'].mult(x0).mult(y0)
@@ -223,7 +223,7 @@ SectionSeddlePointSolver.prototype.EvaluateF = function(f, x0, y0) {
     return xx.add(yy).add(xy).add(x).add(y).add(f[''])
 }
 
-SectionSeddlePointSolver.prototype.SolveCommon = function(f, a, b) {
+SectionSaddlePointSolver.prototype.SolveCommon = function(f, a, b) {
     let dx = {
         'x^2': new Fraction('0'),
         'y^2': new Fraction('0'),
@@ -325,7 +325,7 @@ SectionSeddlePointSolver.prototype.SolveCommon = function(f, a, b) {
     }
 }
 
-SectionSeddlePointSolver.prototype.Solve = function() {
+SectionSaddlePointSolver.prototype.Solve = function() {
     try {
         let f = this.ParseFunction()
 
