@@ -144,36 +144,40 @@ SegmentContinuousSolver.prototype.Solve = function() {
 
     let smin = a.sub(this.x1).square()
     let smax = b.sub(this.x1).square()
+    let s_sign = new Fraction('1')
 
     let tmin = a.sub(this.x2).square()
     let tmax = b.sub(this.x2).square()
+    let t_sign = new Fraction('1')
 
     if (tmin.gt(tmax)) {
         let tmp = tmin
         tmin = tmax
         tmax = tmp
+        t_sign = t_sign.neg()
     }
 
     if (smin.gt(smax)) {
         let tmp = smin
         smin = smax
         smax = tmp
+        s_sign = s_sign.neg()
     }
 
     this.solveBox.innerHTML += `<b>Замена</b>:<br>`
-    this.solveBox.innerHTML += `s = (x<sub>1</sub> ${this.x1.neg().signStr()})<sup>2</sup>, s ∊ [${smin}, ${smax}]<br>`
-    this.solveBox.innerHTML += `t = (x<sub>2</sub> ${this.x2.neg().signStr()})<sup>2</sup>, t ∊ [${tmin}, ${tmax}]<br>`
+    this.solveBox.innerHTML += `s = (x<sub>1</sub> ${this.x1.neg().signStr()})<sup>2</sup>, s ∊ [${smin}, ${smax}], x<sub>1</sub> = ${this.x1} ± sqrt(s)<br>`
+    this.solveBox.innerHTML += `t = (x<sub>2</sub> ${this.x2.neg().signStr()})<sup>2</sup>, t ∊ [${tmin}, ${tmax}], x<sub>2</sub> = ${this.x2} ± sqrt(t)<br>`
     this.solveBox.innerHTML += `s - t = ${y}y ${c.signStr()}<br><br>`
 
     let k1 = (new Fraction('1')).div(y)
     let k2 = c.neg().div(y)
 
     let ky = k1.mult(this.y1)
-    let kc = k2.add(this.c1)
+    let kc = k2.mult(this.y1).add(this.c1)
 
     this.solveBox.innerHTML += `ŷ = ${k1}(s - t) ${k2.signStr()}<br>`
     this.solveBox.innerHTML += `F(x, ŷ) → max<br>`
-    this.solveBox.innerHTML += `F̅(s, t) = -s + (${k1}(s - t) ${k2.signStr()})<sup>2</sup> ${ky.signStr()}(s - t) ${k2.signStr()} ${this.c1.signStr()} = -s + (${k1}(s - t) ${k2.signStr()})<sup>2</sup> ${ky.signStr()}(s - t) ${kc.signStr()} → max<sub>s, t</sub><br>`
+    this.solveBox.innerHTML += `F̅(s, t) = -s + (${k1}(s - t) ${k2.signStr()})<sup>2</sup> ${ky.signStr()}(s - t) ${kc.sub(this.c1).signStr()} ${this.c1.signStr()} = -s + (${k1}(s - t) ${k2.signStr()})<sup>2</sup> ${ky.signStr()}(s - t) ${kc.signStr()} → max<sub>s, t</sub><br>`
 
     let f_st = []
     let s = [smin, smax]
@@ -200,17 +204,23 @@ SegmentContinuousSolver.prototype.Solve = function() {
         }
     }
 
-    let x1 = s_max.sqrt().add(this.x1)
-    let x2 = t_max.sqrt().add(this.x2)
+    let x1_1 = s_max.sqrt().add(this.x1)
+    let x1_2 = s_max.sqrt().neg().add(this.x1)
 
-    let x1_norm = x1.max(a).min(b)
-    let x2_norm = x2.max(a).min(b)
+    let x2_1 = t_max.sqrt().add(this.x2)
+    let x2_2 = t_max.sqrt().neg().add(this.x2)
+
+    let x1_norm = s_max.sqrt().mult(s_sign).add(this.x1)
+    let x2_norm = t_max.sqrt().mult(t_sign).add(this.x2)
     let y0 = k1.mult(s_max.sub(t_max)).add(k2)
 
     let v = this.F(x1_norm, y0)
 
     this.solveBox.innerHTML += `<br>Максимальное значение F̅(s, t) = ${f_max} достигается при s = ${s_max} и t = ${t_max}</b><br>`
-    this.solveBox.innerHTML += `<b>Подставляем замену</b>: x<sub>1</sub> = max(${a}, min(${b}, ${x1})) = ${x1_norm}, x<sub>2</sub> = max(${a}, min(${b}, ${x2})) = ${x2_norm}, <b>y<sub>0</sub> = ${y0}</b>, <b>v = ${v}<br>`
+    this.solveBox.innerHTML += `<b>Подставляем замену</b>:<br>`
+    this.solveBox.innerHTML += `x<sub>1</sub> = ${this.x1} ± sqrt(${s_max}) = {${x1_1}, ${x1_2}} = ${x1_norm}<br>`
+    this.solveBox.innerHTML += `x<sub>2</sub> = ${this.x2} ± sqrt(${t_max}) = {${x2_1}, ${x2_2}} = ${x2_norm}<br>`
+    this.solveBox.innerHTML += `<b>y<sub>0</sub> = ${y0}</b>, <b>v = ${v}<br>`
 
     let plotFx = document.createElement('div')
     plotFx.id = 'plot-fx'
