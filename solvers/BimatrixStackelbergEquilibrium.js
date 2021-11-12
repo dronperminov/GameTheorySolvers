@@ -73,11 +73,11 @@ BimatrixStackelbergEquilibrium.prototype.Solve = function() {
     this.solveBox.innerHTML += `<br>`
 
     for (let i = 0; i < matrix1.length; i++) {
-        this.solveBox.innerHTML += `<b>W(${i + 1})</b> = ${w[i]}<br>`
+        this.solveBox.innerHTML += `<b>W(${i + 1})</b> = ${w[i].html()}<br>`
     }
 
     this.solveBox.innerHTML += `<br><b>Ответ:<br>`
-    this.solveBox.innerHTML += `<b>F</b> = ${F}<br>`
+    this.solveBox.innerHTML += `<b>F</b> = ${F.html()}<br>`
 
     let points = this.FindPoints(matrix1, F)
     this.solveBox.innerHTML += `<b>(i<sup>0</sup>, j<sup>0</sup>)</b>: ${points.map((p) => '(' + (p.i + 1) + ', ' + (p.j + 1) + ')').join(', ')}<br>`

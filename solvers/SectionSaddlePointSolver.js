@@ -83,6 +83,8 @@ SectionSaddlePointSolver.prototype.JoinTokens = function(tokens) {
 
         if (coef.isOne() && token[1] != '')
             coef = ''
+        else
+            coef = coef.html()
 
         resultTokens.push(`${sign}${coef}${token[1]}`.replace('^2', '<sup>2</sup>'))
     }
@@ -163,13 +165,13 @@ SectionSaddlePointSolver.prototype.SolveXX_XY_YY = function(f, a, b) {
     let v_down = f_x_yx_a.gt(f_x_yx_b) ? f_x_yx_a : f_x_yx_b
     let x0 = f_x_yx_a.gt(f_x_yx_b) ? a : b
 
-    this.solveBox.innerHTML += `<p class='math'>v̲ = max<sub>x</sub> min<sub>y</sub> F(x, y)</p>`
-    this.solveBox.innerHTML += `<p class='math'>F(x, y) → min<sub>y</sub>: ${this.JoinTokens([[f['xy'], 'x'], [f['y^2'].mult(new Fraction('2')), 'y']])} = 0 → <b>y(x) = ${yx}x</b> ∈ Y</p>`
-    this.solveBox.innerHTML += `<p class='math'>F(x, y(x)) = ${this.JoinTokens([[f_x_yx1, 'x^2'], [f_x_yx2, 'x^2'], [f_x_yx3, 'x^2']])} = ${f_x_yx}x<sup>2</sup> → max<br>`
-    this.solveBox.innerHTML += `Максимум либо в ${a}, либо в ${b}:<br>`
-    this.solveBox.innerHTML += `x = ${a}: ${f_x_yx_a}<br>`
-    this.solveBox.innerHTML += `x = ${b}: ${f_x_yx_b}<br>`
-    this.solveBox.innerHTML += `<b>x⁰ = ${x0}, v̲ = ${v_down}</b></p><br>`
+    this.solveBox.innerHTML += `<span class='math'>v̲ = max<sub>x</sub> min<sub>y</sub> F(x, y)</p>`
+    this.solveBox.innerHTML += `<span class='math'>F(x, y) → min<sub>y</sub>: ${this.JoinTokens([[f['xy'], 'x'], [f['y^2'].mult(new Fraction('2')), 'y']])} = 0 → <b>y(x) = ${yx.html()}x</b> ∈ Y</p>`
+    this.solveBox.innerHTML += `<span class='math'>F(x, y(x)) = ${this.JoinTokens([[f_x_yx1, 'x^2'], [f_x_yx2, 'x^2'], [f_x_yx3, 'x^2']])} = ${f_x_yx.html()}x<sup>2</sup> → max<br>`
+    this.solveBox.innerHTML += `Максимум либо в ${a.html()}, либо в ${b.html()}:<br>`
+    this.solveBox.innerHTML += `x = ${a.html()}: ${f_x_yx_a.html()}<br>`
+    this.solveBox.innerHTML += `x = ${b.html()}: ${f_x_yx_b.html()}<br>`
+    this.solveBox.innerHTML += `<b>x⁰ = ${x0.html()}, v̲ = ${v_down.html()}</b></p><br>`
 
     let f_a_y = { 'y^2': f['y^2'], 'y': f['xy'].mult(a), '': f['x^2'].mult(a).mult(a) }
     let f_b_y = { 'y^2': f['y^2'], 'y': f['xy'].mult(b), '': f['x^2'].mult(b).mult(b) }
@@ -181,33 +183,33 @@ SectionSaddlePointSolver.prototype.SolveXX_XY_YY = function(f, a, b) {
     let y0 = p
     let v_up = f_a_y[''].add(f_a_y['y'].mult(y0)).add(f_a_y['y^2'].mult(y0).mult(y0))
 
-    this.solveBox.innerHTML += `<p class='math'>v̅ = min<sub>y</sub> max<sub>x</sub> F(x, y)</p>`
-    this.solveBox.innerHTML += `<p class='math'>Max<sub>x</sub> либо в ${a}, либо в ${b}:</p>`
-    this.solveBox.innerHTML += `<p class='math'>F(${a}, y) = ${this.PrintFunction(f_a_y)}</p>`
-    this.solveBox.innerHTML += `<p class='math'>F(${b}, y) = ${this.PrintFunction(f_b_y)}</p>`
-    this.solveBox.innerHTML += `<p class='math'>x(y) = { ${a}, y &ge; ${p}, иначе ${b} }</p>`
-    this.solveBox.innerHTML += `<p class='math'>F(x(y), y) = { ${this.PrintFunction(f_a_y)}, y &ge; ${p}, иначе ${this.PrintFunction(f_b_y)} }</p>`
+    this.solveBox.innerHTML += `<span class='math'>v̅ = min<sub>y</sub> max<sub>x</sub> F(x, y)</p>`
+    this.solveBox.innerHTML += `<span class='math'>Max<sub>x</sub> либо в ${a.html()}, либо в ${b.html()}:</p>`
+    this.solveBox.innerHTML += `<span class='math'>F(${a.html()}, y) = ${this.PrintFunction(f_a_y)}</p>`
+    this.solveBox.innerHTML += `<span class='math'>F(${b.html()}, y) = ${this.PrintFunction(f_b_y)}</p>`
+    this.solveBox.innerHTML += `<span class='math'>x(y) = { ${a.html()}, y &ge; ${p.html()}, иначе ${b.html()} }</p>`
+    this.solveBox.innerHTML += `<span class='math'>F(x(y), y) = { ${this.PrintFunction(f_a_y)}, y &ge; ${p.html()}, иначе ${this.PrintFunction(f_b_y)} }</p>`
     let plot = this.Plot(a, b, p, f_a_y, f_b_y)
-    this.solveBox.innerHTML += `<p class='math'>У параболы F(${a}, y) вершина находится в ${pa}</p>`
-    this.solveBox.innerHTML += `<p class='math'>У параболы F(${b}, y) вершина находится в ${pb}</p>`
+    this.solveBox.innerHTML += `<span class='math'>У параболы F(${a.html()}, y) вершина находится в ${pa.html()}</p>`
+    this.solveBox.innerHTML += `<span class='math'>У параболы F(${b.html()}, y) вершина находится в ${pb.html()}</p>`
     if (pa.gt(p)) {
         y0 = pa
         v_up = f_a_y[''].add(f_a_y['y'].mult(pa)).add(f_a_y['y^2'].mult(pa).mult(pa))
-        this.solveBox.innerHTML += `<p class='math'>Точка ${pa} > ${p}</p>`
+        this.solveBox.innerHTML += `<span class='math'>Точка ${pa.html()} > ${p.html()}</p>`
     }
     else if (pb.lt(p)) {
         y0 = pb
         v_up = f_b_y[''].add(f_b_y['y'].mult(pb)).add(f_b_y['y^2'].mult(pb).mult(pb))
-        this.solveBox.innerHTML += `<p class='math'>Точка ${pb} < ${p}</p>`
+        this.solveBox.innerHTML += `<span class='math'>Точка ${pb.html()} < ${p.html()}</p>`
     }
 
-    this.solveBox.innerHTML += `<b>y⁰ = ${y0}, v̅ = ${v_up}</b></p><br>`
+    this.solveBox.innerHTML += `<b>y⁰ = ${y0.html()}, v̅ = ${v_up.html()}</b></p><br>`
 
     if (v_down.eq(v_up)) {
-        this.solveBox.innerHTML += `<p class='math'>v̅ = v̲ = v → <b>имеется седловая точка</b>: (${x0}, ${y0})</p>`
+        this.solveBox.innerHTML += `<span class='math'>v̅ = v̲ = v → <b>имеется седловая точка</b>: (${x0.html()}, ${y0.html()})</p>`
     }
     else {
-        this.solveBox.innerHTML += `<p class='math'>v̅ ≠ v̲ → <b>седловых точек нет</b></p>`
+        this.solveBox.innerHTML += `<span class='math'>v̅ ≠ v̲ → <b>седловых точек нет</b></p>`
     }
 
     Plotly.newPlot('plot', plot.data, plot.layout);
@@ -278,50 +280,50 @@ SectionSaddlePointSolver.prototype.SolveCommon = function(f, a, b) {
         '': f['y^2'].mult(yx['']).mult(yx['']).add(f['y'].mult(yx[''])).add(f['']),
     }
 
-    this.solveBox.innerHTML += `<p class='math'>max<sub>x</sub> F(x, y): ${this.PrintFunction(dx)} = 0 → x(y) = ${this.PrintFunction(xy)}</p>`
-    this.solveBox.innerHTML += `<p class='math'>min<sub>y</sub> F(x(y), y): ${this.PrintFunction(f_xy_y)} → min</p>`
+    this.solveBox.innerHTML += `<span class='math'>max<sub>x</sub> F(x, y): ${this.PrintFunction(dx)} = 0 → x(y) = ${this.PrintFunction(xy)}</p>`
+    this.solveBox.innerHTML += `<span class='math'>min<sub>y</sub> F(x(y), y): ${this.PrintFunction(f_xy_y)} → min</p>`
 
     let y0
 
     if (f_xy_y['y^2'].isPos()) {
         y0 = f_xy_y['y'].div(f_xy_y['y^2'].mult(new Fraction('-2')))
-        this.solveBox.innerHTML += `<p class='math'>Минимум лежит на вершине параболы: </p>`
+        this.solveBox.innerHTML += `<span class='math'>Минимум лежит на вершине параболы: </p>`
     }
     else {
         let fa = this.EvaluateF(f_xy_y, new Fraction('0'), a)
         let fb = this.EvaluateF(f_xy_y, new Fraction('0'), b)
         y0 = fa.lt(fb) ? a : b
-        this.solveBox.innerHTML += `<p class='math'>Минимум лежит на границе (но это не точно): F(x(y), ${a}) = ${fa}, F(x(y), ${b}) = ${fb}</p>`
+        this.solveBox.innerHTML += `<span class='math'>Минимум лежит на границе (но это не точно): F(x(y), ${a.html()}) = ${fa.html()}, F(x(y), ${b.html()}) = ${fb.html()}</p>`
     }
 
     let v_up = this.EvaluateF(f_xy_y, new Fraction('0'), y0)
 
-    this.solveBox.innerHTML += `<p class='math'><b>y⁰ = ${y0}, v̅ = ${v_up}</b></p><br>`
+    this.solveBox.innerHTML += `<span class='math'><b>y⁰ = ${y0.html()}, v̅ = ${v_up.html()}</b></p><br>`
 
-    this.solveBox.innerHTML += `<p class='math'>min<sub>y</sub> F(x, y): ${this.PrintFunction(dy)} = 0 → y(x) = ${this.PrintFunction(yx)}</p>`
-    this.solveBox.innerHTML += `<p class='math'>max<sub>x</sub> F(x, y(x)): ${this.PrintFunction(f_x_yx)} → max</p>`
+    this.solveBox.innerHTML += `<span class='math'>min<sub>y</sub> F(x, y): ${this.PrintFunction(dy)} = 0 → y(x) = ${this.PrintFunction(yx)}</p>`
+    this.solveBox.innerHTML += `<span class='math'>max<sub>x</sub> F(x, y(x)): ${this.PrintFunction(f_x_yx)} → max</p>`
 
     let x0
 
     if (f_x_yx['x^2'].isNeg()) {
         x0 = f_x_yx['x'].div(f_x_yx['x^2'].mult(new Fraction('-2')))
-        this.solveBox.innerHTML += `<p class='math'>Максимум лежит на вершине параболы: </p>`
+        this.solveBox.innerHTML += `<span class='math'>Максимум лежит на вершине параболы: </p>`
     }
     else {
         let fa = this.EvaluateF(f_x_yx, a, new Fraction('0'))
         let fb = this.EvaluateF(f_x_yx, b, new Fraction('0'))
         x0 = fa.gt(fb) ? a : b
-        this.solveBox.innerHTML += `<p class='math'>Максимум лежит на границе (но это не точно): F(${a}, y(x)) = ${fa}, F(${b}, y(x)) = ${fb}</p>`
+        this.solveBox.innerHTML += `<span class='math'>Максимум лежит на границе (но это не точно): F(${a.html()}, y(x)) = ${fa.html()}, F(${b.html()}, y(x)) = ${fb.html()}</p>`
     }
 
     let v_down = this.EvaluateF(f_x_yx, x0, new Fraction('0'))
-    this.solveBox.innerHTML += `<p class='math'><b>x⁰ = ${x0}, v̲ = ${v_down}</b></p><br>`
+    this.solveBox.innerHTML += `<span class='math'><b>x⁰ = ${x0.html()}, v̲ = ${v_down.html()}</b></p><br>`
 
     if (v_down.eq(v_up)) {
-        this.solveBox.innerHTML += `<p class='math'>v̅ = v̲ = v → <b>имеется седловая точка</b>: (${x0}, ${y0})</p>`
+        this.solveBox.innerHTML += `<span class='math'>v̅ = v̲ = v → <b>имеется седловая точка</b>: (${x0.html()}, ${y0.html()})</p>`
     }
     else {
-        this.solveBox.innerHTML += `<p class='math'>v̅ ≠ v̲ → <b>седловых точек нет</b></p>`
+        this.solveBox.innerHTML += `<span class='math'>v̅ ≠ v̲ → <b>седловых точек нет</b></p>`
     }
 }
 
@@ -333,8 +335,8 @@ SectionSaddlePointSolver.prototype.Solve = function() {
         let b = new Fraction(this.bBox.value)
 
         this.solveBox.innerHTML = `<h2>Решение</h2>`
-        this.solveBox.innerHTML += `<p class='math'><b>Введённая функция</b>: ${this.PrintFunction(f)}</p>`
-        this.solveBox.innerHTML += `<p class='math'><b>X = Y</b>: [${a}, ${b}]</p><br>`
+        this.solveBox.innerHTML += `<span class='math'><b>Введённая функция</b>: ${this.PrintFunction(f)}</p>`
+        this.solveBox.innerHTML += `<span class='math'><b>X = Y</b>: [${a.html()}, ${b.html()}]</p><br>`
 
         if (!f['x'].isZero() || !f['y'].isZero() || !f[''].isZero() || f['x^2'].isNeg() || f['y^2'].isNeg()) {
             this.SolveCommon(f, a, b)

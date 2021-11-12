@@ -35,9 +35,9 @@ SegmentContinuousSolver.prototype.ShowInputFunction = function() {
     eq2.className = 'system-cell'
     eq3.className = 'system-cell'
 
-    eq1.innerHTML = `-(x ${this.x1.neg().signStr()})<sup>2</sup> + y<sup>2</sup> ${this.y1.signStr()}y ${this.c1.signStr()}, x &le; y`
+    eq1.innerHTML = `-(x ${this.x1.neg().signHtml()})<sup>2</sup> + y<sup>2</sup> ${this.y1.signHtml()}y ${this.c1.signHtml()}, x &le; y`
     eq2.innerHTML = '&nbsp;'
-    eq3.innerHTML = `-(x ${this.x2.neg().signStr()})<sup>2</sup> + y<sup>2</sup> ${this.y2.signStr()}y ${this.c2.signStr()}, x &ge; y`
+    eq3.innerHTML = `-(x ${this.x2.neg().signHtml()})<sup>2</sup> + y<sup>2</sup> ${this.y2.signHtml()}y ${this.c2.signHtml()}, x &ge; y`
 
     system.appendChild(eq1)
     system.appendChild(eq2)
@@ -128,7 +128,7 @@ SegmentContinuousSolver.prototype.Solve = function() {
     this.solveBox.innerHTML = `<h2>Решение</h2>`
     this.solveBox.innerHTML += `<b>Введённые данные:</b><br>`
     this.ShowInputFunction()
-    this.solveBox.innerHTML += `X = Y = [${a}, ${b}]<br><br>`
+    this.solveBox.innerHTML += `X = Y = [${a.html()}, ${b.html()}]<br><br>`
 
     let plot = document.createElement('div')
     plot.id = 'plot-fxy'
@@ -139,8 +139,8 @@ SegmentContinuousSolver.prototype.Solve = function() {
     let y = this.y1.sub(this.y2)
     let c = this.c1.sub(this.c2)
 
-    this.solveBox.innerHTML += `-(x<sub>1</sub> ${this.x1.neg().signStr()})<sup>2</sup> + y<sup>2</sup> ${this.y1.signStr()}y ${this.c1.signStr()} = -(x<sub>2</sub> ${this.x2.neg().signStr()})<sup>2</sup> + y<sup>2</sup> ${this.y2.signStr()}y ${this.c2.signStr()}<br>`
-    this.solveBox.innerHTML += `(x<sub>1</sub> ${this.x1.neg().signStr()})<sup>2</sup> - (x<sub>2</sub> ${this.x2.neg().signStr()})<sup>2</sup> = ${y}y ${c.signStr()}<br><br>`
+    this.solveBox.innerHTML += `-(x<sub>1</sub> ${this.x1.neg().signHtml()})<sup>2</sup> + y<sup>2</sup> ${this.y1.signHtml()}y ${this.c1.signHtml()} = -(x<sub>2</sub> ${this.x2.neg().signHtml()})<sup>2</sup> + y<sup>2</sup> ${this.y2.signHtml()}y ${this.c2.signHtml()}<br>`
+    this.solveBox.innerHTML += `(x<sub>1</sub> ${this.x1.neg().signHtml()})<sup>2</sup> - (x<sub>2</sub> ${this.x2.neg().signHtml()})<sup>2</sup> = ${y.html()}y ${c.signHtml()}<br><br>`
 
     let smin = a.sub(this.x1).square()
     let smax = b.sub(this.x1).square()
@@ -165,9 +165,9 @@ SegmentContinuousSolver.prototype.Solve = function() {
     }
 
     this.solveBox.innerHTML += `<b>Замена</b>:<br>`
-    this.solveBox.innerHTML += `s = (x<sub>1</sub> ${this.x1.neg().signStr()})<sup>2</sup>, s ∊ [${smin}, ${smax}], x<sub>1</sub> = ${this.x1} ± sqrt(s)<br>`
-    this.solveBox.innerHTML += `t = (x<sub>2</sub> ${this.x2.neg().signStr()})<sup>2</sup>, t ∊ [${tmin}, ${tmax}], x<sub>2</sub> = ${this.x2} ± sqrt(t)<br>`
-    this.solveBox.innerHTML += `s - t = ${y}y ${c.signStr()}<br><br>`
+    this.solveBox.innerHTML += `s = (x<sub>1</sub> ${this.x1.neg().signHtml()})<sup>2</sup>, s ∊ [${smin.html()}, ${smax.html()}], x<sub>1</sub> = ${this.x1.html()} ± sqrt(s)<br>`
+    this.solveBox.innerHTML += `t = (x<sub>2</sub> ${this.x2.neg().signHtml()})<sup>2</sup>, t ∊ [${tmin.html()}, ${tmax.html()}], x<sub>2</sub> = ${this.x2.html()} ± sqrt(t)<br>`
+    this.solveBox.innerHTML += `s - t = ${y.html()}y ${c.signHtml()}<br><br>`
 
     let k1 = (new Fraction('1')).div(y)
     let k2 = c.neg().div(y)
@@ -175,9 +175,9 @@ SegmentContinuousSolver.prototype.Solve = function() {
     let ky = k1.mult(this.y1)
     let kc = k2.mult(this.y1).add(this.c1)
 
-    this.solveBox.innerHTML += `ŷ = ${k1}(s - t) ${k2.signStr()}<br>`
+    this.solveBox.innerHTML += `ŷ = ${k1.html()}(s - t) ${k2.signHtml()}<br>`
     this.solveBox.innerHTML += `F(x, ŷ) → max<br>`
-    this.solveBox.innerHTML += `F̅(s, t) = -s + (${k1}(s - t) ${k2.signStr()})<sup>2</sup> ${ky.signStr()}(s - t) ${kc.sub(this.c1).signStr()} ${this.c1.signStr()} = -s + (${k1}(s - t) ${k2.signStr()})<sup>2</sup> ${ky.signStr()}(s - t) ${kc.signStr()} → max<sub>s, t</sub><br>`
+    this.solveBox.innerHTML += `F̅(s, t) = -s + (${k1.html()}(s - t) ${k2.signHtml()})<sup>2</sup> ${ky.signHtml()}(s - t) ${kc.sub(this.c1).signHtml()} ${this.c1.signHtml()} = -s + (${k1.html()}(s - t) ${k2.signHtml()})<sup>2</sup> ${ky.signHtml()}(s - t) ${kc.signHtml()} → max<sub>s, t</sub><br>`
 
     let f_st = []
     let s = [smin, smax]
@@ -194,7 +194,7 @@ SegmentContinuousSolver.prototype.Solve = function() {
             let f = si.neg().add(k1.mult(s_t).add(k2).square()).add(ky.mult(s_t)).add(kc)
             f_st.push(f)
 
-            this.solveBox.innerHTML += `F̅(${si}, ${ti}) = ${f}<br>`
+            this.solveBox.innerHTML += `F̅(${si.html()}, ${ti.html()}) = ${f.html()}<br>`
 
             if (f_max === null || f.gt(f_max)) {
                 f_max = f
@@ -216,11 +216,11 @@ SegmentContinuousSolver.prototype.Solve = function() {
 
     let v = this.F(x1_norm, y0)
 
-    this.solveBox.innerHTML += `<br>Максимальное значение F̅(s, t) = ${f_max} достигается при s = ${s_max} и t = ${t_max}</b><br>`
+    this.solveBox.innerHTML += `<br>Максимальное значение F̅(s, t) = ${f_max.html()} достигается при s = ${s_max.html()} и t = ${t_max.html()}</b><br>`
     this.solveBox.innerHTML += `<b>Подставляем замену</b>:<br>`
-    this.solveBox.innerHTML += `x<sub>1</sub> = ${this.x1} ± sqrt(${s_max}) = {${x1_1}, ${x1_2}} = ${x1_norm}<br>`
-    this.solveBox.innerHTML += `x<sub>2</sub> = ${this.x2} ± sqrt(${t_max}) = {${x2_1}, ${x2_2}} = ${x2_norm}<br>`
-    this.solveBox.innerHTML += `<b>y<sub>0</sub> = ${y0}</b>, <b>v = ${v}<br>`
+    this.solveBox.innerHTML += `x<sub>1</sub> = ${this.x1.html()} ± sqrt(${s_max.html()}) = {${x1_1.html()}, ${x1_2.html()}} = ${x1_norm.html()}<br>`
+    this.solveBox.innerHTML += `x<sub>2</sub> = ${this.x2.html()} ± sqrt(${t_max.html()}) = {${x2_1.html()}, ${x2_2.html()}} = ${x2_norm.html()}<br>`
+    this.solveBox.innerHTML += `<b>y<sub>0</sub> = ${y0.html()}</b>, <b>v = ${v.html()}<br>`
 
     let plotFx = document.createElement('div')
     plotFx.id = 'plot-fx'
@@ -238,15 +238,15 @@ SegmentContinuousSolver.prototype.Solve = function() {
     let p = k_cp.neg().div(k_p)
     let q = one.sub(p)
 
-    this.solveBox.innerHTML += `Φ(p, y) = p⋅F(${a}, y) + (1 - p)⋅F(${b}, y) = p⋅(y<sup>2</sup> ${this.y1.signStr()}y ${c1.signStr()}) + (1 - p)⋅(y<sup>2</sup> ${this.y2.signStr()}y ${c2.signStr()})<br>`
-    this.solveBox.innerHTML += `Φ'<sub>y</sub>(p, y<sub>0</sub>) = 0 → p⋅(2y<sub>0</sub> ${this.y1.signStr()}) + (1 - p)⋅(2y<sub>0</sub> ${this.y2.signStr()}) = 0<br>`
-    this.solveBox.innerHTML += `${k_p}p ${k_cp.signStr()} = 0 → <b>p = ${p}</b><br>`
-    this.solveBox.innerHTML += `<b>pΦ<sub>0</sub> = ${p}I<sub>0</sub> + ${q}I<sub>1</sub></b><br>`
+    this.solveBox.innerHTML += `Φ(p, y) = p⋅F(${a.html()}, y) + (1 - p)⋅F(${b.html()}, y) = p⋅(y<sup>2</sup> ${this.y1.signHtml()}y ${c1.signHtml()}) + (1 - p)⋅(y<sup>2</sup> ${this.y2.signHtml()}y ${c2.signHtml()})<br>`
+    this.solveBox.innerHTML += `Φ'<sub>y</sub>(p, y<sub>0</sub>) = 0 → p⋅(2y<sub>0</sub> ${this.y1.signHtml()}) + (1 - p)⋅(2y<sub>0</sub> ${this.y2.signHtml()}) = 0<br>`
+    this.solveBox.innerHTML += `${k_p.html()}p ${k_cp.signHtml()} = 0 → <b>p = ${p.html()}</b><br>`
+    this.solveBox.innerHTML += `<b>pΦ<sub>0</sub> = ${p.html()}I<sub>0</sub> + ${q.html()}I<sub>1</sub></b><br>`
 
     this.solveBox.innerHTML += `<br><b>Ответ:</b><br>`
-    this.solveBox.innerHTML += `<b>v = ${v}</b><br>`
-    this.solveBox.innerHTML += `<b>y<sub>0</sub> = ${y0}</b><br>`
-    this.solveBox.innerHTML += `<b>pΦ<sub>0</sub> = ${p}I<sub>0</sub> + ${q}I<sub>1</sub></b><br>`
+    this.solveBox.innerHTML += `<b>v = ${v.html()}</b><br>`
+    this.solveBox.innerHTML += `<b>y<sub>0</sub> = ${y0.html()}</b><br>`
+    this.solveBox.innerHTML += `<b>pΦ<sub>0</sub> = ${p.html()}I<sub>0</sub> + ${q.html()}I<sub>1</sub></b><br>`
 
     this.PlotFunction(a, b)
     this.PlotFunctionX(a, b, y0)

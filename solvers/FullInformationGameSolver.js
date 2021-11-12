@@ -16,7 +16,7 @@ FullInformationGameSolver.prototype.MakeMatrixTable = function(matrix) {
         for (let j = 0; j < matrix[i].length; j++) {
             let cell = document.createElement('div')
             cell.className = 'matrix-cell'
-            cell.innerHTML = matrix[i][j]
+            cell.innerHTML = matrix[i][j].html()
             row.appendChild(cell)
         }
 
@@ -298,7 +298,7 @@ FullInformationGameSolver.prototype.Solve = function() {
         this.solveBox.innerHTML += `<br><b>Итоговое дерево игры:</b><br>`
         this.solveBox.appendChild(this.MakeCanvas(`canvas-tree`))
 
-        this.solveBox.innerHTML += `<br><b>Цена игры v:</b> ${tree.value}<br>`
+        this.solveBox.innerHTML += `<br><b>Цена игры v:</b> ${tree.value.html()}<br>`
         this.solveBox.innerHTML += `<b>Оптимальные стратегии игроков:</b><br>`
 
         let strategies = []

@@ -77,6 +77,7 @@ SaddlePointSolver.prototype.MakeMatrixTable = function(matrix, mins, maxs) {
     cell1.appendChild(table)
     cell1.appendChild(maxBlocks)
     cell2.appendChild(minBlocks)
+    cell2.style.verticalAlign = 'top'
     row.appendChild(cell1)
     row.appendChild(cell2)
     block.appendChild(row)
@@ -158,14 +159,14 @@ SaddlePointSolver.prototype.Solve = function() {
         this.solveBox.innerHTML = `<h2>Решение</h2>`
         this.solveBox.innerHTML += `<b>Матрица игры:</b><br>`
         this.solveBox.appendChild(table)
-        this.solveBox.innerHTML += `<br><p class='math'><b>W(i)</b> = min<sub>1&le;j&le;${columns}</sub> a<sub>ij</sub>: ${mins.join(', ')}</p>`
-        this.solveBox.innerHTML += `<p class='math'><b>M(j)</b> = max<sub>1&le;i&le;${rows}</sub> a<sub>ij</sub>: ${maxs.join(', ')}</p><br>`
+        this.solveBox.innerHTML += `<br><span class='math'><b>W(i)</b> = min<sub>1&le;j&le;${columns}</sub> a<sub>ij</sub>: ${mins.map((v) => v.html()).join(', ')}</p>`
+        this.solveBox.innerHTML += `<span class='math'><b>M(j)</b> = max<sub>1&le;i&le;${rows}</sub> a<sub>ij</sub>: ${maxs.map((v) => v.html()).join(', ')}</p><br>`
 
-        this.solveBox.innerHTML += `<p class='math'><b>Нижнее значение игры (v̲)</b> = max<sub>1&le;i&le;${rows}</sub> W(i) = ${v_down}</p>`
-        this.solveBox.innerHTML += `<p class='math'><b>Верхнее значение игры (v̅)</b> = min<sub>1&le;j&le;${columns}</sub> M(j) = ${v_up}</p><br>`
+        this.solveBox.innerHTML += `<span class='math'><b>Нижнее значение игры (v̲)</b> = max<sub>1&le;i&le;${rows}</sub> W(i) = ${v_down.html()}</p>`
+        this.solveBox.innerHTML += `<span class='math'><b>Верхнее значение игры (v̅)</b> = min<sub>1&le;j&le;${columns}</sub> M(j) = ${v_up.html()}</p><br>`
 
         if (v_down != v_up) {
-            this.solveBox.innerHTML += `<p class='math'>v̅ ≠ v̲ → <b>седловых точек нет</b></p>`
+            this.solveBox.innerHTML += `<span class='math'>v̅ ≠ v̲ → <b>седловых точек нет</b></p>`
         }
         else {
             let seddle_points = []
@@ -175,16 +176,16 @@ SaddlePointSolver.prototype.Solve = function() {
                     seddle_points.push(`(${x}, ${y})`)
 
             if (seddle_points.length > 1) {
-                this.solveBox.innerHTML += `<p class='math'>v̅ = v̲ = v → <b>имеются седловые точки</b></p>`
-                this.solveBox.innerHTML += `<p class='math'><b>Седловые точки</b>: ${seddle_points.join(', ')}</p>`
+                this.solveBox.innerHTML += `<span class='math'>v̅ = v̲ = v → <b>имеются седловые точки</b></p>`
+                this.solveBox.innerHTML += `<span class='math'><b>Седловые точки</b>: ${seddle_points.join(', ')}</p>`
             }
             else {
-                this.solveBox.innerHTML += `<p class='math'>v̅ = v̲ = v → <b>имеется седловая точка</b>: ${seddle_points.join(', ')}</p>`
+                this.solveBox.innerHTML += `<span class='math'>v̅ = v̲ = v → <b>имеется седловая точка</b>: ${seddle_points.join(', ')}</p>`
             }
         }
         
-        this.solveBox.innerHTML += `<p class='math'><b>Максимин стратегия</b>: X⁰ = {${x_strategy.join(', ')}}</p>`
-        this.solveBox.innerHTML += `<p class='math'><b>Минимакс стратегия</b>: Y⁰ = {${y_strategy.join(', ')}}</p>`
+        this.solveBox.innerHTML += `<span class='math'><b>Максимин стратегия</b>: X⁰ = {${x_strategy.join(', ')}}</p>`
+        this.solveBox.innerHTML += `<span class='math'><b>Минимакс стратегия</b>: Y⁰ = {${y_strategy.join(', ')}}</p>`
     }
     catch (error) {
         alert(error)

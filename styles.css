@@ -86,6 +86,7 @@ table, td, tr {
     position: absolute;
     width: 100%;
     left: 0;
+    bottom: 50%;
     margin-top: calc(25% - 4px);
     border-top: 2px solid #ffaa44;
 }
@@ -116,4 +117,21 @@ table, td, tr {
     text-align: left;
     border-radius: 100%;
     position: relative;
+}
+
+.fraction {
+    display: inline-block;
+    font-size: 75%;
+    margin: 0 1px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.fraction .numerator {
+    vertical-align: top;
+    border-bottom: 2px solid;
+}
+
+.fraction .denumerator {
+    vertical-align: bottom;
 }

@@ -18,7 +18,7 @@ MatrixGameSolver.prototype.MakeMatrixTable = function(matrix, rows = null, colum
         for (let j = 0; j < matrix[i].length; j++) {
             let cell = document.createElement('div')
             cell.className = 'matrix-cell'
-            cell.innerHTML = matrix[i][j]
+            cell.innerHTML = matrix[i][j].html()
 
             if (rows && rows.indexOf(i) == -1)
                 cell.classList.add('removed-row')
@@ -103,10 +103,10 @@ MatrixGameSolver.prototype.RemoveDominantRowByCombination = function(matrix, seq
             let index = this.GetOneHotIndex(sequence)
 
             if (index > -1) {
-                this.solveBox.innerHTML += `<p><b>Строка ${rows[row] + 1} доминируется строкой ${indexes[index] + 1}, удаляем её:</b></p>`
+                this.solveBox.innerHTML += `<span><b>Строка ${rows[row] + 1} доминируется строкой ${indexes[index] + 1}, удаляем её:</b></p>`
             }
             else {
-                this.solveBox.innerHTML += `<p><b>Строка ${rows[row] + 1} доминируется выпуклой комбинацией строк {${indexes.map((v) => v + 1).join(', ')}} с коэффициентами {${sequence.map((v) => v.toString()).join(', ')}}, удаляем её:</b></p>`
+                this.solveBox.innerHTML += `<span><b>Строка ${rows[row] + 1} доминируется выпуклой комбинацией строк {${indexes.map((v) => v + 1).join(', ')}} с коэффициентами {${sequence.map((v) => v.html()).join(', ')}}, удаляем её:</b></p>`
             }
 
             rows.splice(row, 1)
@@ -141,10 +141,10 @@ MatrixGameSolver.prototype.RemoveDominantColumnByCombination = function(matrix, 
             let index = this.GetOneHotIndex(sequence)
 
             if (index > -1) {
-                this.solveBox.innerHTML += `<p><b>Столбец ${columns[column] + 1} доминирует столбец ${indexes[index] + 1}, удаляем его:</b></p>`
+                this.solveBox.innerHTML += `<span><b>Столбец ${columns[column] + 1} доминирует столбец ${indexes[index] + 1}, удаляем его:</b></p>`
             }
             else {
-                this.solveBox.innerHTML += `<p><b>Столбец ${columns[column] + 1} доминирует выпуклую комбинацию столбцов {${indexes.map((v) => v + 1).join(', ')}} с коэффициентами {${sequence.map((v) => v.toString()).join(', ')}}, удаляем его:</b></p>`
+                this.solveBox.innerHTML += `<span><b>Столбец ${columns[column] + 1} доминирует выпуклую комбинацию столбцов {${indexes.map((v) => v + 1).join(', ')}} с коэффициентами {${sequence.map((v) => v.html()).join(', ')}}, удаляем его:</b></p>`
             }
             columns.splice(column, 1)
             this.solveBox.appendChild(this.MakeMatrixTable(matrix, rows, columns))
@@ -223,19 +223,19 @@ MatrixGameSolver.prototype.Solve2x2 = function(matrix, indexes, p, q) {
     q[indexes.columns[1]] = a11.sub(a21).div(den)
 
     this.solveBox.innerHTML += '<b>Решаем две системы уравнений</b>:<br>'
-    this.solveBox.appendChild(this.MakeSystem([`v = ${a11}p<sub>1</sub> ${a21.signStr()}p<sub>2</sub>`, `v = ${a12}p<sub>1</sub> ${a22.signStr()}p<sub>2</sub>`, `p<sub>1</sub> + p<sub>2</sub> = 1`]))
-    this.solveBox.appendChild(this.MakeSystem([`v = ${a11}q<sub>1</sub> ${a12.signStr()}q<sub>2</sub>`, `v = ${a21}q<sub>1</sub> ${a22.signStr()}q<sub>2</sub>`, `q<sub>1</sub> + q<sub>2</sub> = 1`]))
+    this.solveBox.appendChild(this.MakeSystem([`v = ${a11.html()}p<sub>1</sub> ${a21.signHtml()}p<sub>2</sub>`, `v = ${a12.html()}p<sub>1</sub> ${a22.signHtml()}p<sub>2</sub>`, `p<sub>1</sub> + p<sub>2</sub> = 1`]))
+    this.solveBox.appendChild(this.MakeSystem([`v = ${a11.html()}q<sub>1</sub> ${a12.signHtml()}q<sub>2</sub>`, `v = ${a21.html()}q<sub>1</sub> ${a22.signHtml()}q<sub>2</sub>`, `q<sub>1</sub> + q<sub>2</sub> = 1`]))
     this.solveBox.innerHTML += '<br>'
-    this.solveBox.innerHTML += `p<sub>1</sub> = 1 - p<sub>2</sub> → ${a11} ${a21.sub(a11).signStr()}p<sub>2</sub> = ${a12} ${a22.sub(a12).signStr()}p<sub>2</sub> → ${a11.sub(a12)} = ${a11.sub(a21).sub(a12.sub(a22))}p<sub>2</sub> → p<sub>2</sub> = ${p[indexes.rows[1]]}, p<sub>1</sub> = ${p[indexes.rows[0]]}<br>`
-    this.solveBox.innerHTML += `q<sub>1</sub> = 1 - q<sub>2</sub> → ${a11} ${a12.sub(a11).signStr()}q<sub>2</sub> = ${a21} ${a22.sub(a21).signStr()}q<sub>2</sub> → ${a11.sub(a21)} = ${a11.sub(a12).sub(a21.sub(a22))}q<sub>2</sub> → q<sub>2</sub> = ${q[indexes.columns[1]]}, q<sub>1</sub> = ${q[indexes.columns[0]]}<br>`
+    this.solveBox.innerHTML += `p<sub>1</sub> = 1 - p<sub>2</sub> → ${a11.html()} ${a21.sub(a11).signHtml()}p<sub>2</sub> = ${a12.html()} ${a22.sub(a12).signHtml()}p<sub>2</sub> → ${a11.sub(a12)} = ${a11.sub(a21).sub(a12.sub(a22))}p<sub>2</sub> → p<sub>2</sub> = ${p[indexes.rows[1]]}, p<sub>1</sub> = ${p[indexes.rows[0]]}<br>`
+    this.solveBox.innerHTML += `q<sub>1</sub> = 1 - q<sub>2</sub> → ${a11.html()} ${a12.sub(a11).signHtml()}q<sub>2</sub> = ${a21.html()} ${a22.sub(a21).signHtml()}q<sub>2</sub> → ${a11.sub(a21)} = ${a11.sub(a12).sub(a21.sub(a22))}q<sub>2</sub> → q<sub>2</sub> = ${q[indexes.columns[1]]}, q<sub>1</sub> = ${q[indexes.columns[0]]}<br>`
 
     this.CheckSolve(q, matrix, indexes.rows, indexes.columns, v, false)
     this.CheckSolve(p, matrix, indexes.rows, indexes.columns, v, true)
 
     this.solveBox.innerHTML += '<br>'
-    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
-    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
-    this.solveBox.innerHTML += `<b>Цена игры</b>: ${v}<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.map((v) => v.html()).join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.map((v) => v.html()).join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Цена игры</b>: ${v.html()}<br>`
 
     return v
 }
@@ -270,7 +270,7 @@ MatrixGameSolver.prototype.GetIntersections = function(lines, name) {
 
             points.push(p)
 
-            this.solveBox.innerHTML += `l<sub>${i + 1}</sub> и l<sub>${j + 1}</sub>: ${lines[i].k}${name}<sub>1</sub> ${lines[i].b.signStr()} = ${lines[j].k}${name}<sub>1</sub> ${lines[j].b.signStr()} → ${lines[i].k.sub(lines[j].k)}${name}<sub>1</sub> = ${lines[j].b.sub(lines[i].b)} → ${name}<sub>1</sub> = ${p.x}, l<sub>${i + 1}</sub>(${name}<sub>1</sub>) = ${p.y}<br>`
+            this.solveBox.innerHTML += `l<sub>${i + 1}</sub> и l<sub>${j + 1}</sub>: ${lines[i].k.html()}${name}<sub>1</sub> ${lines[i].b.signHtml()} = ${lines[j].k.html()}${name}<sub>1</sub> ${lines[j].b.signHtml()} → ${lines[i].k.sub(lines[j].k).html()}${name}<sub>1</sub> = ${lines[j].b.sub(lines[i].b).html()} → ${name}<sub>1</sub> = ${p.x.html()}, l<sub>${i + 1}</sub>(${name}<sub>1</sub>) = ${p.y.html()}<br>`
         }
     }
 
@@ -325,7 +325,7 @@ MatrixGameSolver.prototype.MakeLines = function(matrix, indexes, isHorizontal) {
         let k = a1i.sub(a2i)
         lines.push({ k: k, b: a2i })
 
-        this.solveBox.innerHTML += `l<sub>${i + 1}</sub>: ${a1i}${name}<sub>1</sub> ${a2i.signStr()}(1 - ${name}<sub>1</sub>) = ${k}${name}<sub>1</sub> ${a2i.signStr()}<br>`
+        this.solveBox.innerHTML += `l<sub>${i + 1}</sub>: ${a1i.html()}${name}<sub>1</sub> ${a2i.signHtml()}(1 - ${name}<sub>1</sub>) = ${k.html()}${name}<sub>1</sub> ${a2i.signHtml()}<br>`
     }
 
     return lines
@@ -427,7 +427,7 @@ MatrixGameSolver.prototype.SolveGraphically2xN = function(matrix, indexes, p, q)
     p[indexes.rows[0]] = p1
     p[indexes.rows[1]] = p2
 
-    this.solveBox.innerHTML += `Ищем максимальную точку на огибающей среди (${ps.join(', ')}): p<sub>1</sub> = ${p1}, p<sub>2</sub> = ${p2}, v = ${v}<br>`
+    this.solveBox.innerHTML += `Ищем максимальную точку на огибающей среди (${ps.map((v) => v.html()).join(', ')}): p<sub>1</sub> = ${p1.html()}, p<sub>2</sub> = ${p2.html()}, v = ${v.html()}<br>`
 
     if (p1.gt(zero) && p1.lt(one)) {
         let l = this.GetLinesForFind(lines, p1, v, points)
@@ -439,22 +439,22 @@ MatrixGameSolver.prototype.SolveGraphically2xN = function(matrix, indexes, p, q)
         q[indexes.columns[j1]] = q_star
         q[indexes.columns[j2]] = one.sub(q_star)
 
-        this.solveBox.innerHTML += `Искомая точка является пересечением прямых l<sub>${j1 + 1}</sub> и l<sub>${j2 + 1}</sub>, q<sup>*</sup> = k<sub>l<sub>${j2 + 1}</sub></sub> / (k<sub>l<sub>${j2 + 1}</sub></sub> - k<sub>l<sub>${j1 + 1}</sub></sub>) = ${lines[j2].k} : (${lines[j2].k} ${lines[j1].k.neg().signStr()}) = ${q_star}<br>`
+        this.solveBox.innerHTML += `Искомая точка является пересечением прямых l<sub>${j1 + 1}</sub> и l<sub>${j2 + 1}</sub>, q<sup>*</sup> = k<sub>l<sub>${j2 + 1}</sub></sub> / (k<sub>l<sub>${j2 + 1}</sub></sub> - k<sub>l<sub>${j1 + 1}</sub></sub>) = ${lines[j2].k.html()} / (${lines[j2].k.html()} ${lines[j1].k.neg().signHtml()}) = ${q_star.html()}<br>`
     }
     else {
         let j = this.GetLineForBorder(lines, p1, v)
 
         q[indexes.columns[j]] = one
-        this.solveBox.innerHTML += `Через точку (${p1}, ${v}) проходит прямая l<sub>${j + 1}</sub>, q<sub>${j + 1}</sub> = ${one}<br>`
+        this.solveBox.innerHTML += `Через точку (${p1.html()}, ${v.html()}) проходит прямая l<sub>${j + 1}</sub>, q<sub>${j + 1}</sub> = ${one.html()}<br>`
     }
 
     this.CheckSolve(q, matrix, indexes.rows, indexes.columns, v, false)
     this.CheckSolve(p, matrix, indexes.rows, indexes.columns, v, true)
 
     this.solveBox.innerHTML += '<br>'
-    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
-    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
-    this.solveBox.innerHTML += `<b>Цена игры</b>: ${v}<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.map((v) => v.html()).join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.map((v) => v.html()).join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Цена игры</b>: ${v.html()}<br>`
 
     Plotly.newPlot('plot', plot.data, plot.layout);
     return v
@@ -481,7 +481,7 @@ MatrixGameSolver.prototype.SolveGraphicallyNx2 = function(matrix, indexes, p, q)
     q[indexes.columns[0]] = q1
     q[indexes.columns[1]] = q2
 
-    this.solveBox.innerHTML += `Ищем минимальную точку на огибающей среди (${qs.join(', ')}): q<sub>1</sub> = ${q1}, q<sub>2</sub> = ${q2}, v = ${v}<br>`
+    this.solveBox.innerHTML += `Ищем минимальную точку на огибающей среди (${qs.map((v) => v.html()).join(', ')}): q<sub>1</sub> = ${q1.html()}, q<sub>2</sub> = ${q2.html()}, v = ${v.html()}<br>`
 
     if (q1.gt(zero) && q1.lt(one)) {
         let l = this.GetLinesForFind(lines, q1, v, points)
@@ -493,22 +493,22 @@ MatrixGameSolver.prototype.SolveGraphicallyNx2 = function(matrix, indexes, p, q)
         p[indexes.rows[j1]] = p_star
         p[indexes.rows[j2]] = one.sub(p_star)
 
-        this.solveBox.innerHTML += `Искомая точка является пересечением прямых l<sub>${j1 + 1}</sub> и l<sub>${j2 + 1}</sub>, p<sup>*</sup> = k<sub>l<sub>${j2 + 1}</sub></sub> / (k<sub>l<sub>${j2 + 1}</sub></sub> - k<sub>l<sub>${j1 + 1}</sub></sub>) = ${lines[j2].k} : (${lines[j2].k} ${lines[j1].k.neg().signStr()}) = ${p_star}<br>`
+        this.solveBox.innerHTML += `Искомая точка является пересечением прямых l<sub>${j1 + 1}</sub> и l<sub>${j2 + 1}</sub>, p<sup>*</sup> = k<sub>l<sub>${j2 + 1}</sub></sub> / (k<sub>l<sub>${j2 + 1}</sub></sub> - k<sub>l<sub>${j1 + 1}</sub></sub>) = ${lines[j2].k.html()} / (${lines[j2].k.html()} ${lines[j1].k.neg().signHtml()}) = ${p_star.html()}<br>`
     }
     else {
         let j = this.GetLineForBorder(lines, q1, v)
 
         p[indexes.rows[j]] = one
-        this.solveBox.innerHTML += `Через точку (${q1}, ${v}) проходит прямая l<sub>${j + 1}</sub>, p<sub>${j + 1}</sub> = ${one}<br>`
+        this.solveBox.innerHTML += `Через точку (${q1.html()}, ${v.html()}) проходит прямая l<sub>${j + 1}</sub>, p<sub>${j + 1}</sub> = ${one.html()}<br>`
     }
 
     this.CheckSolve(q, matrix, indexes.rows, indexes.columns, v, false)
     this.CheckSolve(p, matrix, indexes.rows, indexes.columns, v, true)
 
     this.solveBox.innerHTML += '<br>'
-    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
-    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
-    this.solveBox.innerHTML += `<b>Цена игры</b>: ${v}<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.map((v) => v.html()).join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.map((v) => v.html()).join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Цена игры</b>: ${v.html()}<br>`
 
     Plotly.newPlot('plot', plot.data, plot.layout);
     return v
@@ -692,17 +692,17 @@ MatrixGameSolver.prototype.CheckSolve = function(solve, matrix, rows, columns, v
                 let aij = matrix[rows[i]][columns[j]]
                 sum = sum.add(aij.mult(solve[rows[i]]))
 
-                this.solveBox.innerHTML += ` ${i == 0 ? aij : aij.signStr()}⋅${solve[rows[i]]}`
+                this.solveBox.innerHTML += ` ${i == 0 ? aij.html() : aij.signHtml()}⋅${solve[rows[i]].html()}`
             }
 
-            this.solveBox.innerHTML += ` = ${sum}`
+            this.solveBox.innerHTML += ` = ${sum.html()}`
 
             if (sum.lt(v)) {
-                this.solveBox.innerHTML += ` < ${v} - <b>решение не подходит, ищем дальше</b><br><br>`
+                this.solveBox.innerHTML += ` < ${v.html()} - <b>решение не подходит, ищем дальше</b><br><br>`
                 return false
             }
             else {
-                this.solveBox.innerHTML += ` &ge; ${v}<br>`
+                this.solveBox.innerHTML += ` &ge; ${v.html()}<br>`
             }
         }
     }
@@ -716,17 +716,17 @@ MatrixGameSolver.prototype.CheckSolve = function(solve, matrix, rows, columns, v
                 let aij = matrix[rows[i]][columns[j]]
                 sum = sum.add(aij.mult(solve[columns[j]]))
 
-                this.solveBox.innerHTML += ` ${j == 0 ? aij : aij.signStr()}⋅${solve[columns[j]]}`
+                this.solveBox.innerHTML += ` ${j == 0 ? aij.html() : aij.signHtml()}⋅${solve[columns[j]].html()}`
             }
 
-            this.solveBox.innerHTML += ` = ${sum}`
+            this.solveBox.innerHTML += ` = ${sum.html()}`
 
             if (sum.gt(v)) {
-                this.solveBox.innerHTML += ` > ${v} - <b>решение не подходит, ищем дальше</b><br><br>`
+                this.solveBox.innerHTML += ` > ${v.html()} - <b>решение не подходит, ищем дальше</b><br><br>`
                 return false
             }
             else {
-                this.solveBox.innerHTML += ` &le; ${v}<br>`
+                this.solveBox.innerHTML += ` &le; ${v.html()}<br>`
             }
         }
     }
@@ -767,8 +767,8 @@ MatrixGameSolver.prototype.SolveSubmatrixSystem = function(matrix, indexes, p, q
                 for (let i = 0; i < columns.length; i++)
                     q[columns[i]] = solve_q[i]
 
-                this.solveBox.innerHTML += `${solve_q.map((v, i) => 'q<sub>' + (i + 1) + '</sub> = ' + v).join(', ')}, v = ${vq}<br>`
-                this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
+                this.solveBox.innerHTML += `${solve_q.map((v, i) => 'q<sub>' + (i + 1) + '</sub> = ' + v.html()).join(', ')}, v = ${vq.html()}<br>`
+                this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.map((v) => v.html()).join(', ')})<br>`
 
                 if (!this.CheckSolve(q, matrix, indexes.rows, indexes.columns, vq, false)) {
                     continue
@@ -788,17 +788,17 @@ MatrixGameSolver.prototype.SolveSubmatrixSystem = function(matrix, indexes, p, q
                 for (let i = 0; i < rows.length; i++)
                     p[rows[i]] = solve_p[i]
 
-                this.solveBox.innerHTML += `${solve_p.map((v, i) => 'p<sub>' + (i + 1) + '</sub> = ' + v).join(', ')}, v = ${vp}<br>`
-                this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
+                this.solveBox.innerHTML += `${solve_p.map((v, i) => 'p<sub>' + (i + 1) + '</sub> = ' + v.html()).join(', ')}, v = ${vp.html()}<br>`
+                this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.map((v) => v.html()).join(', ')})<br>`
 
                 if (!this.CheckSolve(p, matrix, indexes.rows, indexes.columns, vp, true)) {
                     continue
                 }
 
                 this.solveBox.innerHTML += `<br><b>Ответ:</b><br>`
-                this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
-                this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
-                this.solveBox.innerHTML += `<b>Цена игры</b>: ${vp}<br>`
+                this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.map((v) => v.html()).join(', ')})<br>`
+                this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.map((v) => v.html()).join(', ')})<br>`
+                this.solveBox.innerHTML += `<b>Цена игры</b>: ${vp.html()}<br>`
                 return vp
             }
         }
@@ -834,9 +834,9 @@ MatrixGameSolver.prototype.SolveCyclic = function(matrix, indexes, p, q) {
     this.CheckSolve(p, matrix, indexes.rows, indexes.columns, v, true)
 
     this.solveBox.innerHTML += '<br>'
-    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.join(', ')})<br>`
-    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.join(', ')})<br>`
-    this.solveBox.innerHTML += `<b>Цена игры</b>: ${v}<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.map((v) => v.html()).join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.map((v) => v.html()).join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Цена игры</b>: ${v.html()}<br>`
 
     return v
 }

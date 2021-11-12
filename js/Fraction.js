@@ -125,6 +125,18 @@ Fraction.prototype.toString = function() {
     return this.n.toString() + "/" + this.m.toString();
 }
 
+Fraction.prototype.html = function() {
+    if (this.m.equals(bigInt.one))
+        return this.n.toString();
+
+    let html = "";
+
+    if (this.n.isNegative())
+        html += "-";
+
+    return `${html}<div class='fraction'><div class='numerator'>${this.n.abs().toString()}</div><div class='denumerator'>${this.m.toString()}</div></div>`
+}
+
 Fraction.prototype.mult = function(b) {
     let result = new Fraction();
     result.n = this.n.multiply(b.n)
@@ -288,6 +300,14 @@ Fraction.prototype.signStr = function() {
         sign = '- '
 
     return sign + this.abs().toString()
+}
+
+Fraction.prototype.signHtml = function() {
+    let sign = '+ '
+    if (this.isNeg())
+        sign = '- '
+
+    return sign + this.abs().html()
 }
 
 Fraction.prototype.toFloat = function() {
