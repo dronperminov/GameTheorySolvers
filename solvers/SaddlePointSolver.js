@@ -156,6 +156,12 @@ SaddlePointSolver.prototype.Solve = function() {
 
         let table = this.MakeMatrixTable(matrix, mins, maxs)
 
+        let seddle_points = []
+
+        for (let x of x_strategy)
+            for (let y of y_strategy)
+                seddle_points.push(`(${x}, ${y})`)
+
         this.solveBox.innerHTML = `<h2>Решение</h2>`
         this.solveBox.innerHTML += `<b>Матрица игры:</b><br>`
         this.solveBox.appendChild(table)
@@ -165,16 +171,10 @@ SaddlePointSolver.prototype.Solve = function() {
         this.solveBox.innerHTML += `<span class='math'><b>Нижнее значение игры (v̲)</b> = max<sub>1&le;i&le;${rows}</sub> W(i) = ${v_down.html()}</p>`
         this.solveBox.innerHTML += `<span class='math'><b>Верхнее значение игры (v̅)</b> = min<sub>1&le;j&le;${columns}</sub> M(j) = ${v_up.html()}</p><br>`
 
-        if (v_down != v_up) {
+        if (!v_down.eq(v_up)) {
             this.solveBox.innerHTML += `<span class='math'>v̅ ≠ v̲ → <b>седловых точек нет</b></p>`
         }
         else {
-            let seddle_points = []
-
-            for (let x of x_strategy)
-                for (let y of y_strategy)
-                    seddle_points.push(`(${x}, ${y})`)
-
             if (seddle_points.length > 1) {
                 this.solveBox.innerHTML += `<span class='math'>v̅ = v̲ = v → <b>имеются седловые точки</b></p>`
                 this.solveBox.innerHTML += `<span class='math'><b>Седловые точки</b>: ${seddle_points.join(', ')}</p>`
