@@ -281,6 +281,9 @@ Fraction.prototype.getIntegerRoot = function(n) {
 }
 
 Fraction.prototype.sqrt = function() {
+    if (this.isZero())
+        return new Fraction('0')
+
     if (this.isSquareNum(this.n) && this.isSquareNum(this.m)) {
         let result = new Fraction()
         result.n = this.getIntegerRoot(this.n)
