@@ -35,3 +35,12 @@ function ParseMatrix(content) {
 
     return matrix
 }
+
+function MatrixToWord(matrix) {
+    let rows = []
+
+    for (let i = 0; i < matrix.length; i++)
+        rows.push(matrix[i].map((v) => v.toString()).join('&'))
+
+    return `[■(${rows.join('@')})]`
+}
