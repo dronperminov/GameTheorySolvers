@@ -269,6 +269,83 @@ FullInformationGameSolver.prototype.PrintStrategy = function(strategy, index) {
     this.solveBox.innerHTML += `j<sup>${index}</sup>(${strategy[0]}, ${strategy[1]}, ${strategy[2]}) = ${strategy[3]}<br>`
 }
 
+FullInformationGameSolver.prototype.MakeStrategyRow = function(level, strategy, index, strategies) {
+    if (level == 0) {
+        strategies[0].push(index)
+    }
+    else if (level == 1) {
+        strategies[1].push([strategy[0], index])
+    }
+    else if (level == 2) {
+        strategies[2].push([strategy[0], strategy[1], index])
+    }
+    else if (level == 3) {
+        strategies[3].push([strategy[0], strategy[1], strategy[2], index])
+    }
+}
+
+FullInformationGameSolver.prototype.FindPrettyStrategies = function(node, level, strategy = [], strategies = [[], [], [], []]) {
+    if (node == null) {
+        return
+    }
+
+    if (node.left == null && node.right == null) {
+        return
+    }
+
+    if (node.isMin !== null && node.value.eq(node.left.value)) {
+        this.MakeStrategyRow(level, strategy, node.left.pathIndex, strategies)
+    }
+
+    if (node.isMin !== null && node.value.eq(node.right.value)) {
+        this.MakeStrategyRow(level, strategy, node.right.pathIndex, strategies)
+    }
+
+    if (node.isMin !== null && node.value.eq(node.left.value) || level < 3) {
+        this.FindPrettyStrategies(node.left, level + 1, strategy.concat([node.left.pathIndex]), strategies)
+    }
+
+    if (node.isMin !== null && node.value.eq(node.right.value) || level < 3) {
+        this.FindPrettyStrategies(node.right, level + 1, strategy.concat([node.right.pathIndex]), strategies)
+    }
+}
+
+FullInformationGameSolver.prototype.PrintPrettyStrategies = function(tree) {
+    let s = [[], [], [], []]
+    this.FindPrettyStrategies(tree, 0, [], s)
+
+    let alpha = s[0][0]
+    let beta = s[1]
+    let i = s[2].filter((v) => v[0] == s[0][0])
+    let j = s[3].filter((v) => (v[0] == s[1][0][0] && v[1] == s[1][0][1]) || (v[0] == s[1][1][0] && v[1] == s[1][1][1]))
+
+    let j_norm = []
+
+    for (let ji of j) {
+        let index = 0
+
+        while (index < j_norm.length && !(j_norm[index][0] == ji[0] && j_norm[index][1] == ji[1] && j_norm[index][2] == ji[2]))
+            index++
+
+        if (index == j_norm.length) {
+            j_norm.push([ji[0], ji[1], ji[2], [ji[3]]])
+        }
+        else{
+            j_norm[index][3].push(ji[3])
+        }
+    }
+
+    beta = beta.map((v) => `β<sup>0</sup>(${v[0]}) = ${v[1]}`)
+    i = i.map((v) => `i<sup>0</sup>(${v[0]}, ${v[1]}) = ${v[2]}`)
+    j = j_norm.map((v) => `j<sup>0</sup>(${v[0]}, ${v[1]}, ${v[2]}) = ${v[3].length == 1 ? v[3][0] : "{" + v[3].join(', ') + "}"}`)
+
+    this.solveBox.innerHTML += `α<sup>0</sup> = ${alpha}<br>`
+    this.solveBox.innerHTML += `i<sup>0</sup> = i<sup>0</sup>(α, β): ${i.join(', ')}<br><br>`
+
+    this.solveBox.innerHTML += `β<sup>0</sup> = β<sup>0</sup>(α): ${beta.join(', ')}<br>`
+    this.solveBox.innerHTML += `j<sup>0</sup> = j<sup>0</sup>(α, β, i): ${j.join(', ')}<br>`
+}
+
 FullInformationGameSolver.prototype.Solve = function() {
     try {
         let matrix = ParseMatrix(this.matrixBox.value)
@@ -298,7 +375,7 @@ FullInformationGameSolver.prototype.Solve = function() {
         this.solveBox.innerHTML += `<br><b>Итоговое дерево игры:</b><br>`
         this.solveBox.appendChild(this.MakeCanvas(`canvas-tree`))
 
-        this.solveBox.innerHTML += `<br><b>Цена игры v:</b> ${tree.value.html()}<br>`
+        this.solveBox.innerHTML += `<br><b>Цена игры v:</b> ${tree.value.html()}<br><br>`
         this.solveBox.innerHTML += `<b>Оптимальные стратегии игроков:</b><br>`
 
         let strategies = []
@@ -307,6 +384,9 @@ FullInformationGameSolver.prototype.Solve = function() {
 
         for (let i = 0; i < strategies.length; i++)
             this.PrintStrategy(strategies[i], i)
+
+        this.solveBox.innerHTML += `<br><b>Оптимальные стратегии игроков (вид с лекций):</b><br>`
+        this.PrintPrettyStrategies(tree)
 
         for (let i = 0; i < submatrices.length; i++) {
             this.DrawTree(subtrees[i], `canvas-${i}`)
