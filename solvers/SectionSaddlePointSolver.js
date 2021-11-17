@@ -65,7 +65,7 @@ SectionSaddlePointSolver.prototype.ParseFunction = function() {
     return parts
 }
 
-SectionSaddlePointSolver.prototype.JoinTokens = function(tokens) {
+SectionSaddlePointSolver.prototype.JoinTokens = function(tokens, isHtml = true) {
     let resultTokens = []
 
     tokens.sort((a, b) => b[1].length - a[1].length)
@@ -84,15 +84,20 @@ SectionSaddlePointSolver.prototype.JoinTokens = function(tokens) {
         if (coef.isOne() && token[1] != '')
             coef = ''
         else
-            coef = coef.html()
+            coef = isHtml ? coef.html() : coef
 
-        resultTokens.push(`${sign}${coef}${token[1]}`.replace('^2', '<sup>2</sup>'))
+        if (isHtml) {
+            resultTokens.push(`${sign}${coef}${token[1]}`.replace('^2', '<sup>2</sup>'))
+        }
+        else {
+            resultTokens.push(`${sign.replace(/ /g, '')}${coef.n}${token[1]}${coef.m.equals(bigInt.one) ? '' : '/' + coef.m}`)
+        }
     }
 
     return resultTokens.join('')
 }
 
-SectionSaddlePointSolver.prototype.PrintFunction = function(f) {
+SectionSaddlePointSolver.prototype.PrintFunction = function(f, isHtml = true) {
     let tokens = []
 
     for (let arg of ['x^2', 'x', 'xy', 'y', 'y^2', '']) {
@@ -102,7 +107,7 @@ SectionSaddlePointSolver.prototype.PrintFunction = function(f) {
         tokens.push([f[arg], arg])
     }
 
-    return this.JoinTokens(tokens)
+    return this.JoinTokens(tokens, isHtml)
 }
 
 SectionSaddlePointSolver.prototype.EvaluateFunction = function(f, x) {
@@ -216,6 +221,71 @@ SectionSaddlePointSolver.prototype.SolveXX_XY_YY = function(f, a, b) {
     }
     else {
         this.solveBox.innerHTML += `<span class='math'>v̅ ≠ v̲ → <b>седловых точек нет</b></p>`
+    }
+
+    Plotly.newPlot('plot', plot.data, plot.layout);
+}
+
+SectionSaddlePointSolver.prototype.SolveWordXX_XY_YY = function(f, a, b) {
+    let yx = f['xy'].div(f['y^2'].mult(new Fraction('-2')))
+
+    let f_x_yx1 = f['x^2']
+    let f_x_yx2 = yx.mult(f['xy'])
+    let f_x_yx3 = f['y^2'].mult(yx).mult(yx)
+
+    let f_x_yx = f_x_yx1.add(f_x_yx2).add(f_x_yx3)
+    let f_x_yx_a = f_x_yx.mult(a).mult(a)
+    let f_x_yx_b = f_x_yx.mult(b).mult(b)
+    let v_down = f_x_yx_a.gt(f_x_yx_b) ? f_x_yx_a : f_x_yx_b
+    let x0 = f_x_yx_a.gt(f_x_yx_b) ? a : b
+
+    this.solveBox.innerHTML += `F(x, y)=${this.PrintFunction(f, false)}</p>`
+    this.solveBox.innerHTML += `X=Y=[${a}, ${b}]<br><br>`
+    this.solveBox.innerHTML += `v̲=max_x min_y F(x, y)<br>`
+    this.solveBox.innerHTML += `F(x,y)→min_y: F^'_y(x,y)=${this.JoinTokens([[f['xy'], 'x'], [f['y^2'].mult(new Fraction('2')), 'y']], false)}=0→y(x)=${this.JoinTokens([[yx, 'x']], false)}∈Y<br>`
+    this.solveBox.innerHTML += `F(x,y(x))=${this.JoinTokens([[f_x_yx1, 'x^2'], [f_x_yx2, 'x^2'], [f_x_yx3, 'x^2']], false)}=${this.JoinTokens([[f_x_yx, 'x^2']], false)}→max<br><br>`
+    this.solveBox.innerHTML += `Максимум либо в ${a}, либо в ${b}:<br>`
+    this.solveBox.innerHTML += `x=${a}: ${f_x_yx_a}<br>`
+    this.solveBox.innerHTML += `x=${b}: ${f_x_yx_b}<br>`
+    this.solveBox.innerHTML += `x^0=${x0},v̲=${v_down}<br><br>`
+
+    let f_a_y = { 'y^2': f['y^2'], 'y': f['xy'].mult(a), '': f['x^2'].mult(a).mult(a) }
+    let f_b_y = { 'y^2': f['y^2'], 'y': f['xy'].mult(b), '': f['x^2'].mult(b).mult(b) }
+
+    let pa = f_a_y['y'].div(f_a_y['y^2'].mult(new Fraction('-2')))
+    let pb = f_b_y['y'].div(f_b_y['y^2'].mult(new Fraction('-2')))
+
+    let p = f_a_y[''].sub(f_b_y['']).div(f_b_y['y'].sub(f_a_y['y']))
+    let y0 = p
+    let v_up = f_a_y[''].add(f_a_y['y'].mult(y0)).add(f_a_y['y^2'].mult(y0).mult(y0))
+
+    this.solveBox.innerHTML += `v̅=min_y max_x F(x,y)<br>`
+    this.solveBox.innerHTML += `max_x  либо в ${a}, либо в ${b}:<br>`
+    this.solveBox.innerHTML += `F(${a},y)=${this.PrintFunction(f_a_y, false)}<br>`
+    this.solveBox.innerHTML += `F(${b},y)=${this.PrintFunction(f_b_y, false)}<br>`
+    this.solveBox.innerHTML += `x(y)={█(${a}, y&ge;${p}@${b}, иначе)┤<br>`
+    this.solveBox.innerHTML += `F(x(y),y)={█(${this.PrintFunction(f_a_y, false)}, y&ge;${p}@${this.PrintFunction(f_b_y, false)}, иначе)┤<br><br>`
+    let plot = this.Plot(a, b, p, f_a_y, f_b_y)
+    this.solveBox.innerHTML += `У параболы F(${a},y) вершина находится в ${pa}<br>`
+    this.solveBox.innerHTML += `У параболы F(${b},y) вершина находится в ${pb}<br>`
+    if (pa.gt(p)) {
+        y0 = pa
+        v_up = f_a_y[''].add(f_a_y['y'].mult(pa)).add(f_a_y['y^2'].mult(pa).mult(pa))
+        this.solveBox.innerHTML += `Точка ${pa}>${p}<br>`
+    }
+    else if (pb.lt(p)) {
+        y0 = pb
+        v_up = f_b_y[''].add(f_b_y['y'].mult(pb)).add(f_b_y['y^2'].mult(pb).mult(pb))
+        this.solveBox.innerHTML += `Точка ${pb}<${p}<br>`
+    }
+
+    this.solveBox.innerHTML += `y^0=${y0}, v̅=${v_up}<br><br>`
+
+    if (v_down.eq(v_up)) {
+        this.solveBox.innerHTML += `v̅=v̲=v→имеется седловая точка: (${x0}, ${y0})<br>`
+    }
+    else {
+        this.solveBox.innerHTML += `v̅≠v̲→седловых точек нет<br>`
     }
 
     Plotly.newPlot('plot', plot.data, plot.layout);
@@ -349,6 +419,8 @@ SectionSaddlePointSolver.prototype.Solve = function() {
         }
         else {
             this.SolveXX_XY_YY(f, a, b)
+            this.solveBox.innerHTML += `<h2>Решение для Word</h2>`
+            this.SolveWordXX_XY_YY(f, a, b)
         }
     }
     catch (error) {

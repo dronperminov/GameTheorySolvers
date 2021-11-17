@@ -262,11 +262,18 @@ FullInformationGameSolver.prototype.FindStrategies = function(node, level, strat
     }
 }
 
-FullInformationGameSolver.prototype.PrintStrategy = function(strategy, index) {
-    this.solveBox.innerHTML += `α<sup>${index}</sup> = ${strategy[0]}, `
-    this.solveBox.innerHTML += `β<sup>${index}</sup>(${strategy[0]}) = ${strategy[1]}, `
-    this.solveBox.innerHTML += `i<sup>${index}</sup>(${strategy[0]}, ${strategy[1]}) = ${strategy[2]}, `
-    this.solveBox.innerHTML += `j<sup>${index}</sup>(${strategy[0]}, ${strategy[1]}, ${strategy[2]}) = ${strategy[3]}<br>`
+FullInformationGameSolver.prototype.PrintStrategy = function(strategy, index, isHtml) {
+    let html = ''
+    html += `α<sup>${index}</sup> = ${strategy[0]}, `
+    html += `β<sup>${index}</sup>(${strategy[0]}) = ${strategy[1]}, `
+    html += `i<sup>${index}</sup>(${strategy[0]}, ${strategy[1]}) = ${strategy[2]}, `
+    html += `j<sup>${index}</sup>(${strategy[0]}, ${strategy[1]}, ${strategy[2]}) = ${strategy[3]}<br>`
+
+    if (!isHtml) {
+        html = html.replace(/<sup>0<\/sup>/gi, '^0 ').replace(/ = /g, '=')
+    }
+
+    this.solveBox.innerHTML += html
 }
 
 FullInformationGameSolver.prototype.MakeStrategyRow = function(level, strategy, index, strategies) {
@@ -310,7 +317,7 @@ FullInformationGameSolver.prototype.FindPrettyStrategies = function(node, level,
     }
 }
 
-FullInformationGameSolver.prototype.PrintPrettyStrategies = function(tree) {
+FullInformationGameSolver.prototype.PrintPrettyStrategies = function(tree, isHtml = true) {
     let s = [[], [], [], []]
     this.FindPrettyStrategies(tree, 0, [], s)
 
@@ -339,11 +346,18 @@ FullInformationGameSolver.prototype.PrintPrettyStrategies = function(tree) {
     i = i.map((v) => `i<sup>0</sup>(${v[0]}, ${v[1]}) = ${v[2]}`)
     j = j_norm.map((v) => `j<sup>0</sup>(${v[0]}, ${v[1]}, ${v[2]}) = ${v[3].length == 1 ? v[3][0] : "{" + v[3].join(', ') + "}"}`)
 
-    this.solveBox.innerHTML += `α<sup>0</sup> = ${alpha}<br>`
-    this.solveBox.innerHTML += `i<sup>0</sup> = i<sup>0</sup>(α, β): ${i.join(', ')}<br><br>`
+    let html = ''
+    html += `α<sup>0</sup> = ${alpha}<br>`
+    html += `i<sup>0</sup> = i<sup>0</sup>(α, β): ${i.join(', ')}<br><br>`
 
-    this.solveBox.innerHTML += `β<sup>0</sup> = β<sup>0</sup>(α): ${beta.join(', ')}<br>`
-    this.solveBox.innerHTML += `j<sup>0</sup> = j<sup>0</sup>(α, β, i): ${j.join(', ')}<br>`
+    html += `β<sup>0</sup> = β<sup>0</sup>(α): ${beta.join(', ')}<br>`
+    html += `j<sup>0</sup> = j<sup>0</sup>(α, β, i): ${j.join(', ')}<br>`
+
+    if (!isHtml) {
+        html = html.replace(/<sup>0<\/sup>/gi, '^0 ').replace(/ = /g, '=')
+    }
+
+    this.solveBox.innerHTML += html
 }
 
 FullInformationGameSolver.prototype.Solve = function() {
@@ -387,6 +401,17 @@ FullInformationGameSolver.prototype.Solve = function() {
 
         this.solveBox.innerHTML += `<br><b>Оптимальные стратегии игроков (вид с лекций):</b><br>`
         this.PrintPrettyStrategies(tree)
+
+        this.solveBox.innerHTML += '<h2>Решение для Word</h2>'
+        this.solveBox.innerHTML += MatrixToWord(matrix) + '<br><br>'
+
+        this.solveBox.innerHTML += `Разбиваем матрицу на блоки размера ${size}х${size}:<br>`
+        this.solveBox.innerHTML += `Множества строк: ` + indexes.n.map((indexes, i) => `M_${i + 1} ={${indexes.map((v) => v + 1).join(', ')}}`).join(', ') + '<br>'
+        this.solveBox.innerHTML += `Множества столбцов: ` + indexes.m.map((indexes, i) => `N_${i + 1} ={${indexes.map((v) => v + 1).join(', ')}}`).join(', ') + ''
+        this.solveBox.innerHTML += `Цена игры v:</b> ${tree.value}<br>`
+
+        this.solveBox.innerHTML += `Оптимальные стратегии игроков:<br>`
+        this.PrintPrettyStrategies(tree, false)
 
         for (let i = 0; i < submatrices.length; i++) {
             this.DrawTree(subtrees[i], `canvas-${i}`)
