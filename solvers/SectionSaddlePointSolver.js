@@ -105,6 +105,10 @@ SectionSaddlePointSolver.prototype.PrintFunction = function(f) {
     return this.JoinTokens(tokens)
 }
 
+SectionSaddlePointSolver.prototype.EvaluateFunction = function(f, x) {
+    return f[''].add(f['y'].mult(x)).add(f['y^2'].mult(x).mult(x))
+}
+
 SectionSaddlePointSolver.prototype.Plot = function(a, b, p, f_a_y, f_b_y) {
     let div = document.createElement('div')
     div.id = 'plot'
@@ -119,14 +123,14 @@ SectionSaddlePointSolver.prototype.Plot = function(a, b, p, f_a_y, f_b_y) {
 
     while (xi.lt(b.add(h))) {
         x.push(xi.print(2))
-        let v1 = f_b_y[''].add(f_b_y['y'].mult(xi)).add(f_b_y['y^2'].mult(xi).mult(xi)).print(2)
-        let v2 = f_a_y[''].add(f_a_y['y'].mult(xi)).add(f_a_y['y^2'].mult(xi).mult(xi)).print(2)
+        let v1 = this.EvaluateFunction(f_a_y, xi).print(2)
+        let v2 = this.EvaluateFunction(f_b_y, xi).print(2)
 
         if (xi.lt(p)) {
-            y.push(v1)
+            y.push(v2)
         }
         else {
-            y.push(v2)
+            y.push(v1)
         }
 
         y1.push(v1)
@@ -135,21 +139,23 @@ SectionSaddlePointSolver.prototype.Plot = function(a, b, p, f_a_y, f_b_y) {
         xi = xi.add(h)
     }
 
+    let e_x = [p, f_a_y['y'].div(f_a_y['y^2'].mult(new Fraction('-2'))), f_b_y['y'].div(f_b_y['y^2'].mult(new Fraction('-2')))]
+    let e_y = [this.EvaluateFunction(f_a_y, p), this.EvaluateFunction(f_a_y, e_x[1]), this.EvaluateFunction(f_b_y, e_x[2])]
+    let e_texts = [`(${e_x[0]}, ${e_y[0]})`, `(${e_x[1]}, ${e_y[1]})`, `(${e_x[2]}, ${e_y[2]})`]
+
     let data = { x: x, y: y, mode: 'lines', name: 'F(x(y), y)'};
     let data1 = { x: x, y: y1, mode: 'lines', name: `F(${a}, y)`};
     let data2 = { x: x, y: y2, mode: 'lines', name: `F(${b}, y)`};
+    let data3 = { x: e_x.map((v) => v.print(2)), y: e_y.map((v) => v.print(2)), text: e_texts, mode: 'markers', hovertemplate: '<b>%{text}</b>', name: `точки`};
 
     let layout = {
         width: 500,
         height: 400,
         margin: { l: 20, r: 20, b: 20, t: 20 },
-        yaxis: {
-            rangemode: 'tozero'
-        }
     };
 
     this.solveBox.appendChild(div)
-    return { data: [data1, data2, data], layout: layout }
+    return { data: [data1, data2, data, data3], layout: layout }
 }
 
 SectionSaddlePointSolver.prototype.SolveXX_XY_YY = function(f, a, b) {
