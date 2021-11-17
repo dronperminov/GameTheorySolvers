@@ -52,6 +52,13 @@ SegmentContinuousSolver.prototype.ShowInputFunction = function() {
     this.solveBox.appendChild(table)
 }
 
+SegmentContinuousSolver.prototype.ShowInputFunctionWord = function() {
+    let f1 = `-(x${this.x1.neg().signStr()})^2+y^2${this.y1.signStr()}y${this.c1.signStr()}, x&le;y`.replace(/ /g, '')
+    let f2 = `-(x${this.x2.neg().signStr()})^2+y^2${this.y2.signStr()}y${this.c2.signStr()}, x&ge;y`.replace(/ /g, '')
+
+    this.solveBox.innerHTML += `f(x, y) = {█(${f1}@${f2})┤<br>`
+}
+
 SegmentContinuousSolver.prototype.F = function(x, y) {
     if (x.le(y)) {
         let dx = x.sub(this.x1)
@@ -104,13 +111,130 @@ SegmentContinuousSolver.prototype.PlotFunctionX = function(a, b, y0, n = 100) {
     }
 
     let layout = {
-        width: 500,
+        width: 600,
         height: 400,
         margin: { l: 20, r: 20, b: 20, t: 20 },
+        showlegend: true
     };
 
-    let data = { x: x.map((v) => v.toFloat()), y: y.map((v) => v.toFloat()), mode: 'lines'}
+    let data = { x: x.map((v) => v.toFloat()), y: y.map((v) => v.toFloat()), mode: 'lines', name: `F(x, y₀)`}
     Plotly.newPlot('plot-fx', [data], layout)
+}
+
+SegmentContinuousSolver.prototype.SolveWord = function(a, b) {
+    this.solveBox.innerHTML += `<h2>Решение для Word</h2>`
+    this.solveBox.innerHTML += `<b>Введённые данные:</b><br>`
+    this.ShowInputFunctionWord()
+    this.solveBox.innerHTML += `X=Y= [${a}, ${b}]<br><br>`
+    this.solveBox.innerHTML += `F(x_1,y)=F(x_2,y),x_1&le;y&le;x_2<br><br>`
+
+    let y = this.y1.sub(this.y2)
+    let c = this.c1.sub(this.c2)
+
+    this.solveBox.innerHTML += `-(x_1${this.x1.neg().signStr()})^2+y^2 ${this.y1.signStr()}y ${this.c1.signStr()}=-(x_2${this.x2.neg().signStr()})^2+y^2${this.y2.signStr()}y${this.c2.signStr()}<br>`
+    this.solveBox.innerHTML += `(x_1${this.x1.neg().signStr()})^2-(x_2 ${this.x2.neg().signStr()})^2=${y}y${c.signStr()}<br><br>`
+
+    let smin = a.sub(this.x1).square()
+    let smax = b.sub(this.x1).square()
+    let s_sign = new Fraction('1')
+
+    let tmin = a.sub(this.x2).square()
+    let tmax = b.sub(this.x2).square()
+    let t_sign = new Fraction('1')
+
+    if (tmin.gt(tmax)) {
+        let tmp = tmin
+        tmin = tmax
+        tmax = tmp
+        t_sign = t_sign.neg()
+    }
+
+    if (smin.gt(smax)) {
+        let tmp = smin
+        smin = smax
+        smax = tmp
+        s_sign = s_sign.neg()
+    }
+
+    this.solveBox.innerHTML += `Замена:<br>`
+    this.solveBox.innerHTML += `s=(x_1${this.x1.neg().signStr()})^2, s\\in[${smin}, ${smax}], x_1=${this.x1}±\\sqrt(s)<br>`
+    this.solveBox.innerHTML += `t=(x_2${this.x2.neg().signStr()})^2, t\\in[${tmin}, ${tmax}], x_2=${this.x2}±\\sqrt(t)<br>`
+    this.solveBox.innerHTML += `s-t=${y}y${c.signStr()}<br><br>`
+
+    let k1 = (new Fraction('1')).div(y)
+    let k2 = c.neg().div(y)
+
+    let ky = k1.mult(this.y1)
+    let kc = k2.mult(this.y1).add(this.c1)
+
+    this.solveBox.innerHTML += `ŷ=${k1} (s-t)${k2.signStr()}<br>`
+    this.solveBox.innerHTML += `F(x,ŷ)→max<br>`
+    this.solveBox.innerHTML += `F̅(s,t)=-s+(${k1} (s - t)${k2.signStr()})^2 ${ky.signStr()} (s-t)${kc.sub(this.c1).signStr()}${this.c1.signStr()}=-s+(${k1} (s-t)${k2.signStr()})^2 ${ky.signStr()} (s-t)${kc.signStr()} → max_(s, t)<br>`
+
+    let f_st = []
+    let s = [smin, smax]
+    let t = [tmin, tmax]
+
+    let f_max = null
+    let s_max = smin
+    let t_max = tmin
+
+    this.solveBox.innerHTML += `<br>Проверяем граничные значения для переменных s и t:<br>`
+    for (let si of s) {
+        for (let ti of t) {
+            let s_t = si.sub(ti)
+            let f = si.neg().add(k1.mult(s_t).add(k2).square()).add(ky.mult(s_t)).add(kc)
+            f_st.push(f)
+
+            this.solveBox.innerHTML += `F̅(${si}, ${ti})=${f}<br>`
+
+            if (f_max === null || f.gt(f_max)) {
+                f_max = f
+                s_max = si
+                t_max = ti
+            }
+        }
+    }
+
+    let x1_1 = s_max.sqrt().add(this.x1)
+    let x1_2 = s_max.sqrt().neg().add(this.x1)
+
+    let x2_1 = t_max.sqrt().add(this.x2)
+    let x2_2 = t_max.sqrt().neg().add(this.x2)
+
+    let x1_norm = s_max.sqrt().mult(s_sign).add(this.x1)
+    let x2_norm = t_max.sqrt().mult(t_sign).add(this.x2)
+    let y0 = k1.mult(s_max.sub(t_max)).add(k2)
+
+    let v = this.F(x1_norm, y0)
+
+    this.solveBox.innerHTML += `<br>Максимальное значение F̅(s, t)=${f_max} достигается при s=${s_max} и t=${t_max}</b><br>`
+    this.solveBox.innerHTML += `Подставляем замену:<br>`
+    this.solveBox.innerHTML += `x_1=${this.x1}±\\sqrt(${s_max})={${x1_1}, ${x1_2}}=${x1_norm}<br>`
+    this.solveBox.innerHTML += `x_2=${this.x2}±\\sqrt(${t_max})={${x2_1}, ${x2_2}}=${x2_norm}<br>`
+    this.solveBox.innerHTML += `y_0=${y0}, v=${v}<br>`
+
+    let c1 = this.c1.sub(a.sub(this.x1).square())
+    let c2 = this.c2.sub(b.sub(this.x2).square())
+
+    let one = new Fraction('1')
+    let two = new Fraction('2')
+
+    let k_p = this.y1.sub(this.y2)
+    let k_cp = y0.mult(two).add(this.y2)
+
+    let p = k_cp.neg().div(k_p)
+    let q = one.sub(p)
+
+    this.solveBox.innerHTML += `Φ(p, y)=p⋅F(${a}, y)+(1-p)⋅F(${b}, y)=p⋅(y^2 ${this.y1.signStr()}y${c1.signStr()})+(1-p)⋅(y^2 ${this.y2.signStr()}y${c2.signStr()})<br>`
+    this.solveBox.innerHTML += `Φ^'_y (p, y_0)=0 → p⋅(2y_0 ${this.y1.signStr()})+(1-p)⋅(2y_0 ${this.y2.signStr()})=0<br>`
+    this.solveBox.innerHTML += `${k_p} p${k_cp.signStr()}=0 → p=${p}<br>`
+    this.solveBox.innerHTML += `pΦ_0 = ${p} I_0 +${q} I_1<br>`
+
+    this.solveBox.innerHTML += `<br><b>Ответ:</b><br>`
+    this.solveBox.innerHTML += `v=${v}<br>`
+    this.solveBox.innerHTML += `y_0=${y0}<br>`
+    this.solveBox.innerHTML += `pΦ_0=${p} I_0 +${q} I_1<br>`
 }
 
 SegmentContinuousSolver.prototype.Solve = function() {
@@ -248,6 +372,7 @@ SegmentContinuousSolver.prototype.Solve = function() {
     this.solveBox.innerHTML += `<b>y<sub>0</sub> = ${y0.html()}</b><br>`
     this.solveBox.innerHTML += `<b>pΦ<sub>0</sub> = ${p.html()}I<sub>0</sub> + ${q.html()}I<sub>1</sub></b><br>`
 
+    this.SolveWord(a, b)
     this.PlotFunction(a, b)
     this.PlotFunctionX(a, b, y0)
 }
