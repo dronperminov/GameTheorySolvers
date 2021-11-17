@@ -31,7 +31,13 @@ MatrixGameSolver.prototype.MakeMatrixTable = function(matrix, rows = null, colum
 
         table.appendChild(row)
     }
-    return table
+
+    let details = document.createElement('details')
+    let summary = document.createElement('summary')
+    summary.appendChild(table)
+    details.appendChild(summary)
+    details.innerHTML += MatrixToWord(matrix)
+    return details
 }
 
 MatrixGameSolver.prototype.IsAllNonNegative = function(array) {
@@ -226,17 +232,26 @@ MatrixGameSolver.prototype.Solve2x2 = function(matrix, indexes, p, q) {
     this.solveBox.appendChild(this.MakeSystem([`v = ${a11.html()}p<sub>1</sub> ${a21.signHtml()}p<sub>2</sub>`, `v = ${a12.html()}p<sub>1</sub> ${a22.signHtml()}p<sub>2</sub>`, `p<sub>1</sub> + p<sub>2</sub> = 1`]))
     this.solveBox.appendChild(this.MakeSystem([`v = ${a11.html()}q<sub>1</sub> ${a12.signHtml()}q<sub>2</sub>`, `v = ${a21.html()}q<sub>1</sub> ${a22.signHtml()}q<sub>2</sub>`, `q<sub>1</sub> + q<sub>2</sub> = 1`]))
     this.solveBox.innerHTML += '<br>'
-    this.solveBox.innerHTML += `p<sub>1</sub> = 1 - p<sub>2</sub> → ${a11.html()} ${a21.sub(a11).signHtml()}p<sub>2</sub> = ${a12.html()} ${a22.sub(a12).signHtml()}p<sub>2</sub> → ${a11.sub(a12)} = ${a11.sub(a21).sub(a12.sub(a22))}p<sub>2</sub> → p<sub>2</sub> = ${p[indexes.rows[1]]}, p<sub>1</sub> = ${p[indexes.rows[0]]}<br>`
-    this.solveBox.innerHTML += `q<sub>1</sub> = 1 - q<sub>2</sub> → ${a11.html()} ${a12.sub(a11).signHtml()}q<sub>2</sub> = ${a21.html()} ${a22.sub(a21).signHtml()}q<sub>2</sub> → ${a11.sub(a21)} = ${a11.sub(a12).sub(a21.sub(a22))}q<sub>2</sub> → q<sub>2</sub> = ${q[indexes.columns[1]]}, q<sub>1</sub> = ${q[indexes.columns[0]]}<br>`
-
-    this.CheckSolve(q, matrix, indexes.rows, indexes.columns, v, false)
-    this.CheckSolve(p, matrix, indexes.rows, indexes.columns, v, true)
+    this.solveBox.innerHTML += `p<sub>1</sub> = 1 - p<sub>2</sub> → ${a11.html()} ${a21.sub(a11).signHtml()}p<sub>2</sub> = ${a12.html()} ${a22.sub(a12).signHtml()}p<sub>2</sub> → ${a11.sub(a12).html()} = ${a11.sub(a21).sub(a12.sub(a22)).html()}p<sub>2</sub> → p<sub>2</sub> = ${p[indexes.rows[1]].html()}, p<sub>1</sub> = ${p[indexes.rows[0]].html()}<br>`
+    this.solveBox.innerHTML += `q<sub>1</sub> = 1 - q<sub>2</sub> → ${a11.html()} ${a12.sub(a11).signHtml()}q<sub>2</sub> = ${a21.html()} ${a22.sub(a21).signHtml()}q<sub>2</sub> → ${a11.sub(a21).html()} = ${a11.sub(a12).sub(a21.sub(a22)).html()}q<sub>2</sub> → q<sub>2</sub> = ${q[indexes.columns[1]].html()}, q<sub>1</sub> = ${q[indexes.columns[0]].html()}<br>`
 
     this.solveBox.innerHTML += '<br>'
     this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.map((v) => v.html()).join(', ')})<br>`
     this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.map((v) => v.html()).join(', ')})<br>`
     this.solveBox.innerHTML += `<b>Цена игры</b>: ${v.html()}<br>`
 
+    this.solveBox.innerHTML += `<h2>Решение для Word</h2>`
+    this.solveBox.innerHTML += 'Решаем две системы уравнений:<br>'
+    this.solveBox.innerHTML += `{█(v=${a11}p_1 ${a21.signStr()}p_2@v=${a12}p_1 ${a22.signStr()}p_2@p_1 +p_2=1)┤<br>`
+    this.solveBox.innerHTML += `p_1=1-p_2 → ${a11}${a21.sub(a11).signStr()}p_2=${a12}${a22.sub(a12).signStr()}p_2 → ${a11.sub(a12)}=${a11.sub(a21).sub(a12.sub(a22))}p_2 → p_2=${p[indexes.rows[1]]}, p_1=${p[indexes.rows[0]]}<br><br>`
+
+    this.solveBox.innerHTML += `{█(v=${a11}q_1 ${a12.signStr()}q_2@v=${a21}q_1 ${a22.signStr()}q_2@q_1 +q_2=1)┤<br>`
+    this.solveBox.innerHTML += `q_1=1-q_2 → ${a11}${a12.sub(a11).signStr()}q_2=${a21}${a22.sub(a21).signStr()}q_2 → ${a11.sub(a21)}=${a11.sub(a12).sub(a21.sub(a22))}q_2 → q_2=${q[indexes.columns[1]]}, q_1=${q[indexes.columns[0]]}<br>`
+
+    this.solveBox.innerHTML += '<br>'
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия первого игрока (p)</b>: (${p.map((v) => v.toString()).join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Оптимальная стратегия второго игрока (q)</b>: (${q.map((v) => v.toString()).join(', ')})<br>`
+    this.solveBox.innerHTML += `<b>Цена игры</b>: ${v}<br>`
     return v
 }
 
